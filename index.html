@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8"/>
+<title>Užsakymo forma | Augantio </title>
+<script>
+(function() {
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  // Jei URL jau turi ?session=..., pasiimam
+  let sessionId = getQueryParam("session");
+  if (!sessionId) {
+    // Jei neturi – sugeneruojam naują unikalų
+    sessionId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2);
+    // įrašom į URL
+    const url = new URL(window.location);
+    url.searchParams.set("session", sessionId);
+    window.history.replaceState({}, "", url);
+  }
+
+  // pasiekiamas globaliai
+  window.__FORM_SESSION_ID__ = sessionId;
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #F7F6F4;
+    color: #0E0A07;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header { text-align: center; padding: 40px 20px 20px; }
+h1 {
+    font-weight: 300; text-align: center; font-size: 28px;
+    margin-top: 10px; margin-bottom: 0;
+}
+
+form {
+    max-width: 720px; margin: 20px auto; padding: 40px 30px;
+    background-color: white; border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    position: relative;
+}
+
+label { font-weight: 600; display: block; margin: 18px 0 6px; }
+
+input, select, textarea {
+    width: 100%; padding: 12px 14px; border: 1px solid #ccc;
+    border-radius: 10px; font-size: 15px; background-color: #fff;
+    transition: border-color 0.2s ease-in-out;
+}
+input:focus, select:focus, textarea:focus { border-color: #92B1D0; outline: none; }
+
+.step { display: none; }
+.step.active { display: block; animation: fadeIn 0.4s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform:none;} }
+
+.button-row { display: flex; justify-content: space-between; flex-wrap: wrap; margin-top: 30px; }
+
+button {
+    padding: 14px 24px; font-size: 16px; background-color: #92B1D0; color: #fff;
+    border: none; border-radius: 10px; cursor: pointer; transition: background 0.3s ease;
+}
+button:hover { background-color: #7c9dbf; }
+.submit-button { margin-left: auto; }
+
+.progress-container {
+    height: 6px; background-color: #ddd; border-radius: 3px; overflow: hidden; margin-bottom: 30px;
+}
+.progress-bar { height: 100%; width: 0%; background-color: #92B1D0; transition: width 0.3s ease-in-out; }
+
+/* Floating comments */
+.comment-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e9e7e4;
+  padding: 12px;
+  width: 280px;
+  transition: all 0.3s ease;
+}
+.comment-fab.collapsed { 
+  width: auto; height: auto; padding: 0; background: transparent; border: none; box-shadow: none;
+}
+.comment-fab.collapsed .comment-panel { display: none; }
+.comment-fab .comment-toggle {
+  background: #92B1D0; color: #fff; border: none; border-radius: 50%;
+  width: 40px; height: 40px; cursor: pointer; font-size: 18px;
+}
+.comment-fab .comment-panel { margin-top: 10px; }
+.comment-fab textarea { width: 100%; min-height: 100px; }
+
+.comment-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  background: #92B1D0;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.form-select-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 18px;
+  background-color: #92B1D0;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+.form-select-btn:hover {
+  background-color: #7c9dbf;
+}
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: none; /* critical */
+}
+
+/* Section heading tidy spacing */
+.checkbox-section-title {
+  margin: 18px 0 8px;
+  font-weight: 600;
+}
+
+/* Responsive multi-column layout for checkboxes */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 18px; /* row x column spacing */
+  align-items: start;
+}
+
+/* Make each item neat and clickable */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Keep the box aligned nicely */
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+/* Small screens can collapse to single column if desired */
+@media (max-width: 480px) {
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+}
+/* Invoice items — clean, responsive */
+.invoice-item { 
+  padding: 12px 0; 
+  border-bottom: 1px dashed #e6e4e0; 
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 1fr; /* title wider */
+  gap: 14px 16px;  /* row x column */
+  align-items: end; /* align inputs to the baseline */
+}
+
+/* prevent overflow and keep inputs full width */
+.item-grid > div { min-width: 0; }
+.item-grid input, .item-grid select { width: 100%; }
+
+/* keep long labels from stretching grid */
+.item-grid label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* remove button placement */
+.remove-item { 
+  display: inline-block; 
+  margin-top: 8px; 
+}
+
+/* medium screens: give the name field full width on the first row */
+@media (max-width: 720px) {
+  .item-grid { grid-template-columns: 1fr 1fr; }
+  .item-grid > div:nth-child(1) { grid-column: 1 / -1; }
+}
+
+/* small screens: stack into one column */
+@media (max-width: 520px) {
+  .item-grid { grid-template-columns: 1fr; }
+}
+
+/* Allow only the 4th column label to wrap */
+.item-grid > div:nth-child(4) label {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Kliento užsakymo forma</h1>
+</header>
+
+<!-- Form selection -->
+<div id="formSelector" style="max-width:720px;margin:20px auto;padding:30px;background:white;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06);text-align:center;">
+  <p><strong>Pasirinkite formos tipą:</strong></p>
+  <div id="formPick" style="display:flex;flex-direction:column;gap:15px;align-items:stretch;margin-top:20px;">
+    <button type="button" class="form-select-btn" data-type="Projektas"> Projekto </button>
+    <button type="button" class="form-select-btn" data-type="Pasiulymas">Pasiulymo </button>
+<button type="button" class="form-select-btn" data-type="saskaita">Sąskaitos </button>
+
+  </div>
+</div>
+
+<!-- Forms container -->
+<div id="formsContainer">
+
+  <!-- Projektas -->
+  <form id="form-Projektas" class="clientForm" novalidate style="display:none;">
+      
+    <h2 style="text-align:center;margin-bottom:20px;">Projekto Forma</h2>
+    <div class="progress-container"><div class="progress-bar"></div></div>
+
+  <!-- Step 1 -->
+  <div class="step active">
+    <label>Koks yra kliento vardas?</label>
+    <input name="vardas" placeholder="Vardenis Pavardenis" required type="text"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Koks yra kliento el. pašto adresas?</label>
+    <input name="email" placeholder="vardenis@gmail.com" required type="email"/>
+    <div class="error">Įveskite galiojantį el. pašto adresą.</div>
+
+    <label>Koks yra kliento telefono numeris?</label>
+    <input name="telefonas" placeholder="+37061321321" required type="tel"/>
+    <div class="error">Įveskite galiojantį telefono numerį.</div>
+<div class="button-row">
+    <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+  <button type="button" onclick="nextStep()">Toliau</button>
+</div>
+</div> 
+
+  <!-- Step 2 -->
+  <div class="step">
+    <label>Kokios paskirties yra kliento žemės sklypas?</label>
+    <select name="zemes_paskirtis" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Gyvenamoji">Gyvenamosios paskirties žemė</option>
+      <option value="Rekreacine">Rekreacinės paskirties žemė</option>
+      <option value="Zemes ukio">Žemės ūkio paskirties žemė</option>
+      <option value="Misku ukio">Miškų ūkio paskirties žemė</option>
+      <option value="Pramones">Pramonės ir sandėliavimo paskirties žemė</option>
+      <option value="Kita">Kitos paskirties žemė</option>
+    </select>
+    <div class="error">Pasirinkite paskirtį.</div>
+
+    <label>Koks yra pageidaujamas namo vidaus plotas, įskaitant vidines sienas?</label> 
+    <input name="namo_plotas" placeholder="162.93" required type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Kokios energetinės klasės namo pageidauja klientas?</label>
+    <select name="energetine_klase" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="A++">A++</option>
+      <option value="Žemiau A++">Žemiau A++</option>
+      <option value="Vasarnamis">Vasarnamis</option>
+    </select>
+    <div class="error">Pasirinkite klasę.</div>
+
+    <label>Kurį pasiūlymo paketą renkasi klientas?</label>
+    <select name="paketas" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Economy">Economy</option>
+      <option value="Premium">Premium</option>
+      <option value="Premium +">Premium +</option>
+      <option value="Ultra">Ultra</option>
+      <option value="Ultra +">Ultra +</option>
+    </select>
+    <div class="error">Pasirinkite paketą.</div>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step">
+    <label>Koks yra pageidaujamas antresolės karkaso plotas?</label>
+    <input name="antresoles_karkaso_plotas" placeholder="8.12" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Kokio tipo pamatų pageidauja klientas?</label>
+    <select name="pamatai" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Sraigtiniai">Sraigtiniai</option>
+      <option value="Betoniniai Poliams">Betoniniai Poliams</option>
+      <option value="Betoniniai Rostverkas">Betoniniai Rostverkas</option>
+    </select>
+    <div class="error">Pasirinkite Pamatus.</div>
+
+    <label>Kiek metrų sudaro kliento namo vidaus sienų ilgis bėginiais metrais?</label>
+    <input name="sienu_ilgis" placeholder="8.12" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Koks turėtų būti kliento namo vidaus plotis, m?</label>
+    <input name="namo_plotis" placeholder="5.1" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Koks turėtų būti priekinės kliento namo sienos aukštis, m?</label>
+    <input name="priekines_sienos_aukstis" placeholder="3.75" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Koks turėtų būti galinės kliento namo sienos aukštis, m?</label>
+    <input name="galines_sienos_aukstis" placeholder="2.66" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step">
+    <label>Jei namas su daugiau nei vienu šlaitu – koks turėtų būti aukščiausios kliento namo sienos aukštis, m?</label>
+    <input name="auksciausia_siena" placeholder="4.12" type="number"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Kokio tipo stogo šlaito pageidauja klientas?</label>
+    <select name="Slaito Tipas" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Vienaslaitis">Vienašlaitis</option>
+      <option value="Dvislaitis">Dvišlaitis</option>
+      <option value="Daugiaslaitis">Daugiaslaitis</option>
+      <option value="Lygus">Lygus</option>
+    </select>
+    <div class="error">Pasirinkite stogo šlaito tipą.</div>
+
+    <label>Įrašykite objekto, kur bus statomas namas, lokaciją (adresą, miestą )</label>
+    <input name="lokacija" placeholder="Vilnius, Lietuva" type="text"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Kokio tipo stogo dangos pageidauja klientas?</label>
+    <select name="Stogo Danga" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Skardinė danga - Classic">Skardinė danga - Classic</option>
+      <option value="Bituminė stogo danga">Bituminė stogo danga</option>
+      <option value="EPDM stogo danga">EPDM stogo danga</option>
+    </select>
+    <div class="error">Pasirinkite stogo dangos tipą.</div>
+
+    <label>Ar projektas yra kliento (reikalaus daugiau korekcijų), ar mūsų (su minimaliais pakeitimais)?</label>
+    <select name="Projekto tipas" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Mini korekcijos">Mūsų</option>
+      <option value="Individualus Pastatas">Kliento</option>
+      <option value="Org Projektas">Org Projektas</option>
+    </select>
+    <div class="error">Pasirinkite projekto tipą.</div>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step">
+ 
+ 
+    <div class="checkbox-section-title">Ar reikalingi papildomi elementai?</div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="papildomi[]" value="Šild. grindys"> Šild. grindys</label>
+      <label><input type="checkbox" name="papildomi[]" value="Kaminas"> Kaminas</label>
+      <label><input type="checkbox" name="papildomi[]" value="OSB sienoms"> OSB sienoms</label>
+      <label><input type="checkbox" name="papildomi[]" value="Rekup. mini"> Rekup. mini</label>
+      <label><input type="checkbox" name="papildomi[]" value="Rekup. norm."> Rekup. norm.</label>
+      <label><input type="checkbox" name="papildomi[]" value="Kondiš. 1"> Kondiš. 1</label>
+      <label><input type="checkbox" name="papildomi[]" value="Kondiš. 2"> Kondiš. 2</label>
+      <label><input type="checkbox" name="papildomi[]" value="Gipsas"> Gipsas</label>
+      <label><input type="checkbox" name="papildomi[]" value="Elektra"> Elektra</label>
+    </div>
+
+    <div class="checkbox-section-title">Pasirinkite papildomus darbus:</div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="darbai[]" value="MPP (sienų plokštė)"> MPP (sienų plokštė)</label>
+      <label><input type="checkbox" name="darbai[]" value="Fasado dažymas"> Fasado dažymas</label>
+    </div>
+
+    <label>Koks grindų šildymas?</label>
+    <select name="Šildymo Tipas" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Vamzdukai">Vamzdukai</option>
+      <option value="Nieko">Nieko</option>
+      <option value="Infrared">Infrared</option>
+    </select>
+    <div class="error">Pasirinkite šildymo tipą.</div>
+
+    <label>Koks langų tipas</label>
+    <select name="Langų tipas" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="PVC langai">PVC langai</option>
+      <option value="Aliuminiai langai">Aliuminiai langai</option>
+      <option value="Mediniai langai">Mediniai langai</option>
+    </select>
+    <div class="error">Pasirinkite lango tipą.</div>
+
+    <label>Langų pasirinkimas:</label>
+    <div id="windowsSection">
+      <div class="window-block" style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+        <select name="window_size[]" required style="flex:1;">
+          <option value="" disabled selected>Pasirinkite</option>
+          <option value="2000x2250">2000x2250</option>
+          <option value="3600x2250">3600x2250</option>
+          <option value="1000x2250">1000x2250</option>
+          <option value="900x2250 LD">900x2250 LD</option>
+          <option value="1800x2250">1800x2250</option>
+          <option value="660x1180 Stoglangis">660x1180 Stoglangis</option>
+        </select>
+        <input type="number" name="window_qty[]" min="0" placeholder="Kiekis" required style="flex:0.6;"/>
+        <button class="remove-window" type="button" onclick="removeWindow(this)" style="color:red;font-size:14px;background:none;border:none;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <button type="button" onclick="addWindow()" style="margin-top:10px;background-color:#92B1D0;color:white;padding:10px 20px;border:none;border-radius:12px;">+ Pridėti langą</button>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+
+    <!-- Submission step -->
+    <div class="step">
+      <p>Visi duomenys užpildyti.</p>
+      <div class="button-row">
+        <button type="button" onclick="prevStep()">Atgal</button>
+        <button class="submit-button" type="submit">Pateikti</button>
+      </div>
+    </div>
+
+
+<input type="hidden" name="form_type" value="">
+    <!-- Floating comments inside form -->
+    <div class="comment-fab collapsed">
+        
+      <button type="button" class="comment-toggle" aria-expanded="false">✎</button>
+      <div class="comment-panel">
+        <label>Pastabos / Komentarai</label>
+        <textarea class="comment-text" name="comments" placeholder="Įrašykite pastabas..."></textarea>
+      </div>
+    </div>
+  </form>
+
+  <!-- Pasiulymas -->
+  <form id="form-Pasiulymas" class="clientForm" novalidate style="display:none;">
+    <h2 style="text-align:center;margin-bottom:20px;">Pasiulymo Forma</h2>
+    <div class="progress-container"><div class="progress-bar"></div></div>
+    <!-- Same steps -->
+    <div class="step active">
+      <label>Kliento Vardas ir Pavardė</label>
+      <input name="vardas" placeholder="Vardenis Pavardenis" required type="text"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+      
+      <label>El. paštas</label>
+      <input name="email" placeholder="VardenisPavardenis@gmail.com" required type="email"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
+      
+      <label>Telefono Nr.</label>
+      <input name="telefonas" placeholder="+37061234567" required type="tel"/>
+            <div class="error">Šis laukelis yra privalomas.</div>
+            
+    <label>Asmens Kodas</label>
+<input name="asmKodas" placeholder="37061234567 arba 37061234567 ir 37061234567" required type="text" inputmode="numeric" pattern="^\d{8,13}(?:\sir\s\d{8,13})?$" title="Įveskite 1 arba 2 asmens kodus (8–13 skaitmenų), atskirtus žodžiu „ir“"
+/>
+          <div class="error">Šis laukelis yra privalomas.</div>
+          
+      <label>Adresas</label>
+      <input name="adresas" placeholder="Naujoji g.5-9, Rūdiškės, Trakų raj." required type="text"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
+ <div class="button-row">
+    <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+  <button type="button" onclick="nextStep()">Toliau</button>
+</div>
+    </div>
+    
+    <div class="step">
+              <label>Projekto Pavadinimas</label>
+      <input name="ProjektoPavadinimas" placeholder="Namiele Smėlio debesis 140m2 karkasinio namo projektas" required type="text"/>
+    <label>Per Kiek laiko bus projektas paruoštas</label>
+      <input name="ProjektoPeriodas" placeholder="6" required type="number"/>
+     <div class="error">Šis laukelis yra privalomas.</div>
+      <label>Projekto Lygis</label>
+      <select name="p_lygis" required>
+        <option value="" disabled selected>Pasirinkite</option>
+        <option value="4500">NAUJAS NAMO PROJEKTAS (nuo 50M2) 4500 EUR</option>
+        <option value="4100">NAUJAS NAMO PROJEKTAS (iki 50M2) 4100Eur</option>
+        <option value="3800">JAU TURIMAS NAMIELE PROJEKTAS (REIKALINGOS KOREKCIJOS) 3800 Eur</option>
+        <option value="3600">JAU TURIMAS PROJEKTAS (BE KOREKCIJŲ) 3600 Eur</option>
+        <option value="3000">MODULINIO LEIDIMAS (NUO 50M2) 3000Eur</option>
+        <option value="2500">MODULINIO LEIDIMAS (IKI 50M2) 2500Eur</option>
+      </select>
+      <div class="error">Šis laukelis yra privalomas.</div>
+      <div class="button-row"><button type="button" onclick="prevStep()">Atgal</button><button type="button" onclick="nextStep()">Toliau</button></div>
+    </div>
+    <div class="step">
+      <p>Visi duomenys užpildyti.</p>
+      <div class="button-row">
+        <button type="button" onclick="prevStep()">Atgal</button>
+        <button class="submit-button" type="submit">Pateikti</button>
+      </div>
+    </div>
+<input type="hidden" name="form_type" value="">
+    <div class="comment-fab collapsed">
+      <button type="button" class="comment-toggle" aria-expanded="false">✎</button>
+      <div class="comment-panel">
+        <label>Pastabos / Komentarai</label>
+        <textarea class="comment-text" name="comments" placeholder="Įrašykite pastabas..."></textarea>
+      </div>
+    </div>
+
+  </form>
+  
+<!-- Sąskaitos (Invoice) -->
+<form id="form-saskaita" class="clientForm" novalidate style="display:none;">
+  <h2 style="text-align:center;margin-bottom:20px;">Sąskaitos išrašymo forma</h2>
+  <div class="progress-container"><div class="progress-bar"></div></div>
+
+  <!-- Step 1: Gavėjas ir tiekėjas -->
+  <div class="step active">
+    <label>Kuri Namiele įmonė išrašinėja</label>
+    <select name="invoice_company" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="Namiele, UAB">Namiele, UAB</option>
+      <option value="Namiele Group, UAB">Namiele Group, UAB</option>
+      <option value="Rentifus, UAB">Rentifus, UAB</option>
+    </select>
+    <div class="error">Pasirinkite įmonę.</div>
+
+    <label>Vardas Pavardė / Įmonė</label>
+    <input name="invoice_client_name" placeholder="Jonas Jonaitis arba UAB Pavyzdys" required type="text"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Asmens kodas / Įmonės kodas</label>
+    <input name="invoice_client_code" placeholder="123456789 arba 123456789" required type="text" inputmode="numeric"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>PVM m. k (jei yra)</label>
+    <input name="invoice_client_vat" placeholder="LT123456789" type="text"/>
+
+    <label>Adresas</label>
+    <input name="invoice_client_address" placeholder="Gatvė 1, Miestas" required type="text"/>
+    <div class="error">Šis laukelis yra privalomas.</div>
+
+    <label>Gavėjo el. paštas</label>
+    <input name="invoice_client_email" placeholder="gavėjas@pastas.lt" required type="email"/>
+    <div class="error">Įveskite galiojantį el. pašto adresą.</div>
+
+    <div class="button-row">
+      <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Prekės / Paslaugos (repeatable) -->
+  <div class="step">
+    <div class="invoice-items" id="invoiceItems">
+      <div class="invoice-item">
+        <div class="item-grid">
+          <div>
+            <label>Prekės / Paslaugos pavadinimas</label>
+            <input name="item_name[]" required type="text" placeholder="Pvz. Projektavimo paslauga"/>
+            <div class="error">Šis laukelis yra privalomas.</div>
+          </div>
+          <div>
+            <label>Matavimo vnt</label>
+            <select name="item_unit[]" required>
+              <option value="" disabled selected>Pasirinkite</option>
+              <option value="vnt">vnt</option>
+              <option value="val">val</option>
+              <option value="kompl">kompl</option>
+            </select>
+            <div class="error">Pasirinkite matavimo vnt.</div>
+          </div>
+          <div>
+            <label>Kiekis</label>
+            <input name="item_qty[]" required type="number" step="any" inputmode="decimal" placeholder="1"/>
+            <div class="error">Įveskite kiekį.</div>
+          </div>
+          <div>
+            <label>Kaina (EUR, be PVM)</label>
+            <input name="item_price[]" required type="number" step="any" inputmode="decimal" placeholder="100"/>
+            <div class="error">Įveskite kainą.</div>
+          </div>
+        </div>
+        <button class="remove-item" type="button" onclick="removeInvoiceItem(this)" style="color:red;background:none;border:none;cursor:pointer;margin-top:6px;">✕ Pašalinti eilutę</button>
+      </div>
+    </div>
+
+    <button type="button" onclick="addInvoiceItem()" style="margin-top:10px;background-color:#92B1D0;color:white;padding:10px 20px;border:none;border-radius:12px;">+ Pridėti eilutę</button>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Nustatymai -->
+  <div class="step">
+    <label>Apmokėjimo terminas</label>
+    <select name="invoice_terms" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="0">Tą pačia diena</option>
+      <option value="7">7 dienos</option>
+      <option value="14">14 dienų</option>
+      <option value="30">30 dienų</option>
+      <option value="45">45 dienos</option>
+    </select>
+    <div class="error">Pasirinkite apmokėjimo terminą.</div>
+
+ <div class="checkbox-section-title"></div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="AtvirkštinisPVM[]" value="ATV.PVM"> Atvirkštinis PVM</label>
+      </div>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Pateikimas -->
+  <div class="step">
+    <p>Patikrinkite duomenis. Suma bus paskaičiuota automatiškai pagal eilutes.</p>
+
+<div class="invoice-summary">
+  <div><strong>Iš viso be PVM:</strong> <span id="invoiceTotalNet">0.00</span> EUR</div>
+  <div><strong>PVM <span id="vatRateLabel">21</span>%:</strong> <span id="invoiceVAT">0.00</span> EUR</div>
+  <div><strong>Bendra suma (su PVM):</strong> <span id="invoiceTotalGross">0.00</span> EUR</div>
+</div>
+
+<label>Suma žodžiais (be PVM)</label>
+<textarea name="invoice_total_words_net" placeholder="Automatiškai" readonly></textarea>
+
+<label>Suma žodžiais (su PVM)</label>
+<textarea name="invoice_total_words" placeholder="Automatiškai" readonly></textarea>
+
+
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button class="submit-button" type="submit">Pateikti</button>
+    </div>
+  </div>
+
+  <input type="hidden" name="form_type" value="saskaita">
+
+
+
+<a href="https://www.namiele.lt/" target="_blank" aria-label="Namiele pagrindinis puslapis">
+  <img src="https://cdn.brandfetch.io/idGYJwW34f/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B"
+       alt="Namiele logotipas"
+       style="position: fixed; top: 20px; right: 20px; width: 80px; height: 80px; max-width: 20vw; max-height: 20vw; opacity: 1; z-index: 1000; border-radius: 12px;">
+</a>
+
+
+<script>
+let currentForm = null;
+let currentStep = 0;
+let steps = [];
+let progressBar = null;
+
+window.startSelectedForm = function(type) {
+  document.getElementById("formSelector").style.display = "none";
+  document.querySelectorAll("#formsContainer form").forEach(f => f.style.display = "none");
+
+  currentForm = document.getElementById("form-" + type);
+  if (!currentForm) { console.warn("Form not found:", type); return; }
+  currentForm.style.display = "block";
+
+  const hiddenInput = currentForm.querySelector('input[name="form_type"]');
+  if (hiddenInput) hiddenInput.value = type;
+
+  steps = currentForm.querySelectorAll(".step");
+  progressBar = currentForm.querySelector(".progress-bar");
+  currentStep = 0;
+  showStep(0);
+  
+
+  // rebuild window sizes (you already do this elsewhere, safe if it runs)
+if (typeof buildWindowSizeSelect === "function") {
+  currentForm.querySelectorAll('select[name="window_size[]"]').forEach(buildWindowSizeSelect);
+}
+
+// init invoice dropdowns/totals if this is the invoice form
+if (currentForm.id === 'form-saskaita') {
+  recalcInvoice(); // sets initial totals to 0.00
+}
+
+
+  if (typeof restoreSessionData === "function") restoreSessionData(currentForm);
+};
+
+const DEFAULT_VAT_RATE = 0.21; // 21%
+
+
+function updateProgressBar() {
+  if (!progressBar) return;
+  const percent = ((currentStep + 1) / steps.length) * 100;
+  progressBar.style.width = percent + "%";
+}
+function showStep(index) {
+  steps.forEach((step, i) => step.classList.toggle("active", i === index));
+  updateProgressBar();
+}
+function validateStep(stepIndex) {
+  const step = steps[stepIndex];
+  const inputs = step.querySelectorAll("input, select");
+  let valid = true;
+
+  inputs.forEach(input => {
+    let error = input.nextElementSibling;
+    if (error && !error.classList.contains("error")) error = null;
+
+    if (!input.checkValidity()) {
+      if (error) error.style.display = "block";
+      valid = false;
+    } else {
+      if (error) error.style.display = "none";
+    }
+  });
+
+  return valid;
+}
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  currentStep++;
+  if (currentStep < steps.length) showStep(currentStep);
+}
+function prevStep() {
+  if (currentStep > 0) { currentStep--; showStep(currentStep); }
+}
+
+
+document.querySelectorAll("#formsContainer form").forEach(form => {
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // validate the visible form's steps
+    for (let i = 0; i < steps.length; i++) {
+      if (!validateStep(i)) { currentStep = i; showStep(i); return; }
+    }
+
+    const fd = new FormData(this);
+    const json = {};
+    const tmp = { window_size: [], window_qty: [] };
+
+    // helper to make safe keys (same logic as old file)
+    const makeKey = (text = "") => {
+      const map = { 'ą':'a','č':'c','ę':'e','ė':'e','į':'i','š':'s','ų':'u','ū':'u','ž':'z','Ą':'A','Č':'C','Ę':'E','Ė':'E','Į':'I','Š':'S','Ų':'U','Ū':'U','Ž':'Z' };
+      const ascii = text.split('').map(ch => map[ch] ?? ch).join('');
+      return ascii.replace(/\./g,'').replace(/\s+/g,'_').replace(/[^A-Za-z0-9_]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'');
+    };
+
+    // build json with arrays for keys ending in [] and capture windows
+    fd.forEach((value, key) => {
+      if (key === "window_size[]") {
+        tmp.window_size.push(value);
+      } else if (key === "window_qty[]") {
+        tmp.window_qty.push(value);
+      } else if (key.endsWith("[]")) {
+        const base = key.slice(0, -2);        // e.g. papildomi[] -> papildomi
+        (json[base] ??= []).push(value);      // collect as array
+      } else {
+        json[key] = value;                    // single value
+      }
+    });
+
+    // expose window arrays as arrays (useful in n8n)
+    if (tmp.window_size.length) json.window_size = tmp.window_size;
+    if (tmp.window_qty.length)  json.window_qty  = tmp.window_qty;
+
+// Rebuild windows from DOM to capture the selected option's GROUP
+const winBlocks = this.querySelectorAll('#windowsSection .window-block, .windowsSection .window-block');
+
+json.windows = Array.from(winBlocks).map(block => {
+  const sel = block.querySelector('select[name="window_size[]"]');
+  const qtyEl = block.querySelector('input[name="window_qty[]"]');
+  const size = sel ? sel.value : "";
+  const qty  = qtyEl ? qtyEl.value : "";
+
+  // read the optgroup label -> prefix
+  let prefix = "X";
+  if (sel && sel.selectedOptions && sel.selectedOptions[0]) {
+    const og = sel.selectedOptions[0].parentElement;
+    if (og && og.tagName && og.tagName.toLowerCase() === 'optgroup') {
+      prefix = GROUP_PREFIX[og.label] || "X";
+    } else {
+      // fallback if no optgroup (shouldn't happen after we rebuild selects)
+      prefix = SIZE_PREFIX[size] || "X";
+    }
+  }
+  return { size, qty, prefix };
+});
+
+
+
+
+// Keep raw arrays for compatibility (same as before)
+json.window_size = json.windows.map(w => w.size);
+json.window_qty  = json.windows.map(w => w.qty);
+
+// flatten window counts by actual group prefix + size
+const windowFlat = {};
+const norm = s => String(s).replace(/\W+/g, "_");
+
+// initialize all catalog counters per group
+Object.entries(WINDOW_OPTIONS).forEach(([group, sizes]) => {
+  const pref = GROUP_PREFIX[group] || "X";
+  sizes.forEach(s => { windowFlat["windows_" + pref + "_" + norm(s)] = 0; });
+});
+
+// tally selected windows
+(json.windows ?? []).forEach(w => {
+  if (!w.size) return;
+  const key = "windows_" + w.prefix + "_" + norm(w.size);
+  const n = Number((w.qty ?? "").toString().replace(",", "."));
+  windowFlat[key] = (windowFlat[key] ?? 0) + (isNaN(n) ? 0 : n);
+});
+
+Object.assign(json, windowFlat);
+
+
+
+    // checkbox helpers like the old file (0/1 flags for each possible value)
+    const allPap = Array.from(this.querySelectorAll('input[type="checkbox"][name="papildomi[]"]')).map(i => i.value);
+    allPap.forEach(v => { json["papildomi_" + makeKey(v)] = 0; });
+    (json.papildomi ?? []).forEach(v => { json["papildomi_" + makeKey(v)] = 1; });
+
+    const allDarb = Array.from(this.querySelectorAll('input[type="checkbox"][name="darbai[]"]')).map(i => i.value);
+    allDarb.forEach(v => { json["darbai_" + makeKey(v)] = 0; });
+    (json.darbai ?? []).forEach(v => { json["darbai_" + makeKey(v)] = 1; });
+
+// ----- Invoice: build items + totals if this is the invoice form -----
+if (this.id === 'form-saskaita' || json.form_type === 'saskaita') {
+  // Build item objects from parallel arrays (names already in json via [] collector)
+  // Build invoice object
+const names  = json['item_name']  || [];
+const units  = json['item_unit']  || [];
+const qtys   = json['item_qty']   || [];
+const prices = json['item_price'] || [];
+
+const items = names.map((n, i) => ({
+  name: n,
+  unit: units[i] ?? "",
+  qty: Number((qtys[i] ?? "0").toString().replace(',', '.')) || 0,
+  price: Number((prices[i] ?? "0").toString().replace(',', '.')) || 0,
+})).map(it => ({ ...it, line_total: +(it.qty * it.price).toFixed(2) }));
+
+const total_net = +(items.reduce((s, it) => s + it.line_total, 0)).toFixed(2);
+
+// reverse VAT flag
+const is_reverse_vat = !!this.querySelector('input[name="AtvirkštinisPVM[]"]:checked');
+
+const vat_rate = is_reverse_vat ? 0 : DEFAULT_VAT_RATE;
+const total_vat = +(total_net * vat_rate).toFixed(2);
+const total_gross = +(total_net + total_vat).toFixed(2);
+
+json.invoice = {
+  company: json.invoice_company || "",
+  client_name: json.invoice_client_name || "",
+  client_code: json.invoice_client_code || "",
+  client_vat: json.invoice_client_vat || "",
+  client_address: json.invoice_client_address || "",
+  client_email: json.invoice_client_email || "",
+  terms_days: Number(json.invoice_terms || 0) || 0,
+  items,
+  total_net,
+  vat_rate,
+  total_vat,
+  total_gross,
+  is_reverse_vat,
+  total_words_net: amountToWordsLt(total_net),
+  total_words: amountToWordsLt(total_gross) + (is_reverse_vat ? ' (atvirkštinis PVM)' : '')
+};
+
+// for convenience
+json.invoice_total_net   = total_net;
+json.invoice_total_vat   = total_vat;
+json.invoice_total_gross = total_gross;
+
+  // Optional: also flatten total into top-level keys for easy mapping in n8n
+  json.invoice_total_net = json.invoice.total_net;
+}
+
+    // send to n8n with session headers
+    try {
+      const sessionId = window.__FORM_SESSION_ID__ || new URL(location).searchParams.get("session") || "unknown";
+      const response = await fetch("https://marvizra.app.n8n.cloud/webhook/form-namiele", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Form-Session": sessionId,
+          "X-Form-Reopened": window.__SESSION_REOPENED__ ? "1" : "0",
+          "X-Form-Changed-Count": "0",
+          "X-Form-Changed-Keys": ""
+        },
+        body: JSON.stringify(json)
+      });
+
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        this.reset();
+      } else {
+        alert("Submission failed.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
+});
+
+
+
+// Comment toggle logic
+document.querySelectorAll('.comment-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const fab = btn.closest('.comment-fab');
+    fab.classList.toggle('collapsed');
+    btn.setAttribute('aria-expanded', fab.classList.contains('collapsed') ? 'false' : 'true');
+  });
+});
+function backToSelector() {
+  // paslepiam visas formas
+  document.querySelectorAll("#formsContainer form").forEach(f => f.style.display = "none");
+  // parodom selector
+  document.getElementById("formSelector").style.display = "block";
+  // resetinam currentForm ir step'us
+  currentForm = null;
+  steps = [];
+  currentStep = 0;
+  progressBar = null;
+}
+async function restoreSessionData(targetForm) {
+  const sessionId = window.__FORM_SESSION_ID__;
+  if (!sessionId || !targetForm) return;
+
+  // 1) fetch server data (best effort)
+  let server = {};
+  try {
+    const res = await fetch("https://marvizra.app.n8n.cloud/webhook/get-session?session=" + encodeURIComponent(sessionId));
+    if (res.ok) server = await res.json();
+  } catch {}
+
+  // 2) merge with local stored values (local wins)
+  const local = (typeof loadLocalSession === "function") ? loadLocalSession(sessionId) : {};
+  const data = Object.assign({}, server, local);
+
+  // 3) fill direct fields by name
+  for (const [key, value] of Object.entries(data)) {
+    if (key === "form_type") continue;
+
+    // direct name
+    const fields = targetForm.querySelectorAll(`[name="${key}"]`);
+    if (fields.length) {
+      fields.forEach(field => {
+        if (field.type === "radio") {
+          field.checked = String(field.value) === String(value);
+        } else if (field.type === "checkbox") {
+          if (Array.isArray(value)) {
+            field.checked = value.map(String).includes(String(field.value));
+          } else {
+            field.checked = !!value;
+          }
+        } else {
+          field.value = value ?? "";
+        }
+        const err = field.nextElementSibling;
+        if (err && err.classList.contains("error") && field.checkValidity()) err.style.display = "none";
+      });
+      continue;
+    }
+
+    // array style name[] fields
+    const arrayFields = targetForm.querySelectorAll(`[name="${key}[]"]`);
+    if (arrayFields.length && Array.isArray(value)) {
+      arrayFields.forEach((field, i) => {
+        if (field.type === "checkbox") {
+          field.checked = value.map(String).includes(String(field.value));
+        } else if (field.type === "radio") {
+          field.checked = String(field.value) === String(value[i]);
+        } else {
+          field.value = value[i] !== undefined ? value[i] : "";
+        }
+        const err = field.nextElementSibling;
+        if (err && err.classList.contains("error") && field.checkValidity()) err.style.display = "none";
+      });
+    }
+  }
+
+  // 4) windows repeater special case (robust)
+  const container =
+    targetForm.querySelector('.windowsSection') ||
+    targetForm.querySelector('#windowsSection');
+
+  if (container && container.firstElementChild) {
+    // accept either window_size / window_qty OR window_size[] / window_qty[]
+    const sizes =
+      Array.isArray(data.window_size)      ? data.window_size :
+      Array.isArray(data["window_size[]"]) ? data["window_size[]"] : [];
+    const qtys  =
+      Array.isArray(data.window_qty)       ? data.window_qty :
+      Array.isArray(data["window_qty[]"])  ? data["window_qty[]"]  : [];
+
+    const blocksNeeded = Math.max(sizes.length, qtys.length);
+
+    // expand to needed count
+    while (blocksNeeded > 0 && container.children.length < blocksNeeded) {
+      const clone = container.firstElementChild.cloneNode(true);
+      clone.querySelectorAll('select,input,textarea').forEach(el => { el.value = ''; el.checked = false; });
+      container.appendChild(clone);
+    }
+
+    // shrink extras but keep at least one block
+    while (container.children.length > Math.max(1, blocksNeeded)) {
+      container.lastElementChild.remove();
+    }
+
+    // fill values per block
+    const blocks = Array.from(container.children);
+    blocks.forEach((block, i) => {
+      const sizeField = block.querySelector('select[name="window_size[]"]');
+      const qtyField  = block.querySelector('input[name="window_qty[]"]');
+      if (sizes[i] !== undefined && sizeField) sizeField.value = String(sizes[i]);
+      if (qtys[i]  !== undefined && qtyField)  qtyField.value  = String(qtys[i]);
+    });
+  }
+}
+// Window size catalog with subsections
+const WINDOW_OPTIONS = {
+  "PVC/Mediniai": [
+    "900x2400","900x2400 LD","2200x2400","2000x2400","1000x2400","2700x2400","4000x2400","6000x2400",
+    "900x2250 LD","4000x2250","6000x2250","1800x2250","2000x2250","3600x2250","700x2250","500x710",
+    "500x1000","1000x1000"
+  ],
+  "Aliuminiai": [
+    "700x2700","900x2700","1000x2700","2000x2700","3000x2700","1500x2700","2500x2700","5000x2700"
+    // the source list had several duplicate "700x2700" entries; duplicates removed intentionally
+  ],
+  "HS Slide": [
+    "3500x2250","3500x2400","4000x2250","4000x2400"
+  ],
+  "Lauko durys": [
+    "1000x2250","1000x2400","1000x2700"
+  ],
+  "Stoglangis": [
+    "66x118"
+  ]
+};
+
+// Map each size -> group prefix to disambiguate counts
+// P = PVC/Mediniai, A = Aliuminiai, S = HS Slide / Lauko durys / Stoglangis
+// Group prefixes we want in counts
+const GROUP_PREFIX = {
+  "PVC/Mediniai": "P",
+  "Aliuminiai": "A",
+  "HS Slide": "S",
+  "Lauko durys": "S",
+  "Stoglangis": "S"
+};
+
+// Map each size -> last-seen group prefix (still useful as a fallback)
+const SIZE_PREFIX = {};
+(function buildSizePrefix() {
+  Object.entries(WINDOW_OPTIONS).forEach(([group, list]) => {
+    const prefix = GROUP_PREFIX[group] || "X";
+    list.forEach(size => { SIZE_PREFIX[size] = prefix; });
+  });
+})();
+
+// ============ INVOICE HELPERS ============
+
+// Add an invoice item row
+function addInvoiceItem() {
+  if (!currentForm) return;
+  const wrap = currentForm.querySelector('#invoiceItems');
+  if (!wrap) return;
+  const first = wrap.querySelector('.invoice-item');
+  const clone = first.cloneNode(true);
+
+  // clear values
+  clone.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+
+  wrap.appendChild(clone);
+  recalcInvoice(); // update totals
+}
+
+// Remove an invoice item row
+function removeInvoiceItem(btn) {
+  const row = btn.closest('.invoice-item');
+  const wrap = row && row.parentElement;
+  if (!wrap) return;
+  if (wrap.querySelectorAll('.invoice-item').length > 1) {
+    row.remove();
+    recalcInvoice();
+  }
+}
+
+// Live recalc on item edits
+document.addEventListener('input', (e) => {
+  if (!currentForm) return;
+  if (!currentForm.querySelector('#invoiceItems')) return; // not on invoice form
+  const el = e.target;
+  if (!currentForm.contains(el)) return;
+  if (el.name === 'item_qty[]' || el.name === 'item_price[]') {
+    recalcInvoice();
+  }
+});
+
+// Compute total and fill “suma žodžiais”
+function recalcInvoice() {
+  if (!currentForm) return;
+
+  // suskaičiuojam sumas
+  const items = currentForm.querySelectorAll('#invoiceItems .invoice-item');
+  let net = 0;
+  items.forEach(it => {
+    const qty = Number((it.querySelector('input[name="item_qty[]"]')?.value || '0').replace(',', '.')) || 0;
+    const price = Number((it.querySelector('input[name="item_price[]"]')?.value || '0').replace(',', '.')) || 0;
+    net += qty * price;
+  });
+
+  const revVat = !!currentForm.querySelector('input[name="AtvirkštinisPVM[]"]:checked');
+  const vatRate = revVat ? 0 : DEFAULT_VAT_RATE;
+  const vat = +(net * vatRate).toFixed(2);
+  const gross = +(net + vat).toFixed(2);
+
+  // atvaizdavimas (be TypeScript !)
+  const netEl   = currentForm.querySelector('#invoiceTotalNet');
+  const vatEl   = currentForm.querySelector('#invoiceVAT');
+  const grossEl = currentForm.querySelector('#invoiceTotalGross');
+  const vatLbl  = currentForm.querySelector('#vatRateLabel');
+  if (netEl)   netEl.textContent   = net.toFixed(2);
+  if (vatEl)   vatEl.textContent   = vat.toFixed(2);
+  if (grossEl) grossEl.textContent = gross.toFixed(2);
+  if (vatLbl)  vatLbl.textContent  = Math.round(vatRate * 100);
+
+  // žodžiais: abu variantai
+  const wordsNet   = amountToWordsLt(net);
+  const wordsGross = amountToWordsLt(gross) + (revVat ? ' (atvirkštinis PVM)' : '');
+
+  const wordsNetEl   = currentForm.querySelector('textarea[name="invoice_total_words_net"]');
+  const wordsGrossEl = currentForm.querySelector('textarea[name="invoice_total_words"]'); // esamas
+  if (wordsNetEl)   wordsNetEl.value   = wordsNet;
+  if (wordsGrossEl) wordsGrossEl.value = wordsGross;
+}
+
+
+// Paprasta lietuviška suma žodžiais (0..999 999) – gerai UI'ui, gramatiką patikslink n8n'e jei reikia
+function numberToWordsLt(n) {
+  n = Math.floor(Math.abs(n));
+  const vien = ["nulis","vienas","du","trys","keturi","penki","šeši","septyni","aštuoni","devyni",
+                "dešimt","vienuolika","dvylika","trylika","keturiolika","penkiolika","šešiolika","septyniolika","aštuoniolika","devyniolika"];
+  const des = ["","","dvidešimt","trisdešimt","keturiasdešimt","penkiasdešimt","šešiasdešimt","septyniasdešimt","aštuoniasdešimt","devyniasdešimt"];
+
+  const iki100 = (x) => {
+    if (x < 20) return vien[x];
+    const t = Math.floor(x/10), v = x%10;
+    return des[t] + (v ? " " + vien[v] : "");
+  };
+  const iki1000 = (x) => {
+    if (x < 100) return iki100(x);
+    const s = Math.floor(x/100), lik = x%100;
+    const sZ = ["","šimtas","du šimtai","trys šimtai","keturi šimtai","penki šimtai","šeši šimtai","septyni šimtai","aštuoni šimtai","devyni šimtai"];
+    return sZ[s] + (lik ? " " + iki100(lik) : "");
+  };
+
+  if (n < 1000) return iki1000(n);
+  const tukst = Math.floor(n/1000), lik = n%1000;
+
+  // tūkstančių linksniavimas
+  const tForm = (k) => {
+    const d = k%10, dd = k%100;
+    if (k === 1) return "tūkstantis";
+    if (dd>=11 && dd<=19) return "tūkstančių";
+    if (d===1) return "tūkstantis";
+    if (d>=2 && d<=9) return "tūkstančiai";
+    return "tūkstančių";
+  };
+
+  return (iki1000(tukst) + " " + tForm(tukst) + (lik ? " " + iki1000(lik) : "")).trim();
+}
+
+// valiutos žodžiais: „euras/eurai/eurų“, „centas/centai/centų“
+function amountToWordsLt(total) {
+  const eur = Math.floor(total);
+  const cnt = Math.round((total - eur) * 100);
+
+  const form3 = (k, v1, v2, v3) => {
+    const d = k%10, dd = k%100;
+    if (k===1) return v1;
+    if (dd>=11 && dd<=19) return v3;
+    if (d>=2 && d<=9) return v2;
+    return v3;
+  };
+
+  const eurW = (eur===0) ? "nulis" : numberToWordsLt(eur);
+  const cntW = (cnt===0) ? "nulis" : numberToWordsLt(cnt);
+
+  const eurU = form3(eur, "euras", "eurai", "eurų");
+  const cntU = form3(cnt, "centas", "centai", "centų");
+
+  return `${eurW} ${eurU} ${cntW} ${cntU}`;
+}
+
+// Build the <select> with optgroups
+function buildWindowSizeSelect(selectEl) {
+  if (!selectEl) return;
+  const current = selectEl.value; // try to preserve selected value
+
+  // clear
+  while (selectEl.firstChild) selectEl.removeChild(selectEl.firstChild);
+
+  // placeholder
+  const ph = document.createElement("option");
+  ph.value = "";
+  ph.disabled = true;
+  ph.selected = true;
+  ph.textContent = "Pasirinkite";
+  selectEl.appendChild(ph);
+
+  // groups
+  Object.entries(WINDOW_OPTIONS).forEach(([label, list]) => {
+    const grp = document.createElement("optgroup");
+    grp.label = label;
+    list.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      grp.appendChild(opt);
+    });
+    selectEl.appendChild(grp);
+  });
+
+  // re-select if possible
+  if (current && [...selectEl.options].some(o => o.value === current)) {
+    selectEl.value = current;
+    ph.selected = false;
+  }
+}
+
+
+function addWindow() {
+  if (!currentForm) return;
+  const container = currentForm.querySelector('.windowsSection') || currentForm.querySelector('#windowsSection');
+  if (!container || !container.firstElementChild) return;
+
+  const clone = container.firstElementChild.cloneNode(true);
+  clone.querySelectorAll('select,input,textarea').forEach(el => { el.value = ''; el.checked = false; });
+
+  // IMPORTANT: rebuild the grouped dropdown inside the clone
+  const sel = clone.querySelector('select[name="window_size[]"]');
+  if (sel) buildWindowSizeSelect(sel);
+
+  container.appendChild(clone);
+}
+
+function removeWindow(btn) {
+  const block = btn.closest('.window-block');
+  const container = block && block.parentElement;
+  if (container && container.children.length > 1) block.remove();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('select[name="window_size[]"]').forEach(buildWindowSizeSelect);
+});
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#formPick .form-select-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      if (typeof window.startSelectedForm === 'function') {
+        window.startSelectedForm(type);
+      }
+    });
+  });
+});
+document.addEventListener('input', (e) => {
+  if (!currentForm) return;
+  const el = e.target;
+  if (!currentForm.contains(el)) return;
+  const err = el.nextElementSibling;
+  if (err && err.classList.contains('error') && el.checkValidity()) {
+    err.style.display = 'none';
+  }
+});
+
+// fields we want to mirror across forms and persist locally
+const SHARED_FIELDS = [
+  "vardas",
+  "email",
+  "telefonas",
+  "adresas",
+  "asmKodas" // exists in SLD only; harmless if missing in others
+];
+
+// local storage helpers keyed by session
+function loadLocalSession(sessionId) {
+  try { return JSON.parse(localStorage.getItem("formSession:" + sessionId)) || {}; }
+  catch { return {}; }
+}
+function saveLocalSession(sessionId, data) {
+  try { localStorage.setItem("formSession:" + sessionId, JSON.stringify(data)); } catch {}
+}
+
+// copy a value to the same-named field in ALL forms, and persist locally
+function setSharedValue(name, value) {
+  // mirror in DOM
+  document.querySelectorAll('#formsContainer form [name="' + name + '"]').forEach(el => {
+    if (el === document.activeElement) return; // do not fight the active input
+    if (el.type === "checkbox" || el.type === "radio") return; // skip complex cases here
+    el.value = value;
+    const err = el.nextElementSibling;
+    if (err && err.classList.contains("error") && el.checkValidity()) err.style.display = "none";
+  });
+
+  // persist locally by session
+  const sid = window.__FORM_SESSION_ID__;
+  if (!sid) return;
+  const stash = loadLocalSession(sid);
+  stash[name] = value;
+  saveLocalSession(sid, stash);
+}
+
+// when user types in a shared field, mirror to other forms and save locally
+document.addEventListener("input", (e) => {
+  if (!currentForm) return;
+  const el = e.target;
+  if (!currentForm.contains(el)) return;
+  const name = el.getAttribute("name");
+  if (!name || !SHARED_FIELDS.includes(name)) return;
+  setSharedValue(name, el.value);
+});
+// allow decimals in all number inputs (phone is type="tel", so untouched)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input[type="number"]').forEach(el => {
+    el.setAttribute('step', 'any');        // enables 4.3 etc
+    el.setAttribute('inputmode', 'decimal'); // mobile shows decimal keypad
+  });
+});
+// live: turn 4,3 into 4.3 so checkValidity() passes
+document.addEventListener('input', (e) => {
+  if (!currentForm) return;
+  const el = e.target;
+  if (!currentForm.contains(el)) return;
+  if (el.matches('input[type="number"]')) {
+    const v = el.value.replace(',', '.');
+    if (v !== el.value) el.value = v;
+  }
+});
+
+// extra safety: normalize again right before building FormData
+document.querySelectorAll("#formsContainer form").forEach(form => {
+  form.addEventListener("submit", function () {
+    this.querySelectorAll('input[type="number"]').forEach(el => {
+      if (el.value && el.value.includes(',')) el.value = el.value.replace(',', '.');
+    });
+  }, { capture: true }); // run before your main submit handler
+});
+
+
+
+</script>
+
+</body>
+</html>
