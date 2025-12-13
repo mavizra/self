@@ -263,6 +263,21 @@ button:hover { background-color: #7c9dbf; }
     <label>Koks yra kliento telefono numeris?</label>
     <input name="telefonas" placeholder="+37061321321" required type="tel"/>
     <div class="error">Įveskite galiojantį telefono numerį.</div>
+     <label>Įmonės Pavadinimas</label>
+    <input name="imone" placeholder="UAB Įmonė" required type="text"/>
+    <div class="error">Įveskite įmonės pavadinimą.</div>
+     <label>Įmonės Puslapis</label>
+    <input name="imone" placeholder="www.imonė.com" required type="text"/>
+    <div class="error">Įveskite įmonės puslapi.</div>
+    <label>Kaip norima komunikuoti</label>
+    <select name="komunikacija" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="whatsap">WhatsApp</option>
+      <option value="email">E-mail</option>
+      <option value="slack">Slack</option>
+      <option value="other">Other</option>
+    </select>
+    <div class="error">Pasirinkite komunikacija.</div>
 <div class="button-row">
     <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
   <button type="button" onclick="nextStep()">Toliau</button>
@@ -271,122 +286,21 @@ button:hover { background-color: #7c9dbf; }
 
   <!-- Step 2 -->
   <div class="step">
-    <label>Kokios paskirties yra kliento žemės sklypas?</label>
-    <select name="zemes_paskirtis" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Gyvenamoji">Gyvenamosios paskirties žemė</option>
-      <option value="Rekreacine">Rekreacinės paskirties žemė</option>
-      <option value="Zemes ukio">Žemės ūkio paskirties žemė</option>
-      <option value="Misku ukio">Miškų ūkio paskirties žemė</option>
-      <option value="Pramones">Pramonės ir sandėliavimo paskirties žemė</option>
-      <option value="Kita">Kitos paskirties žemė</option>
-    </select>
-    <div class="error">Pasirinkite paskirtį.</div>
+    <label>Koks projekto pavadinimas?</label> 
+    <input name="pavadinimas" placeholder="n8n -> CRM -> WhatsApp" required type="text"/>
+    <div class="error">Įveskite pavadinimą.</div>
+    
+<label>Koks projekto tikslas?</label> 
+    <input name="tikslas" placeholder="Pagreitinti pardavimų procesus" required type="text"/>
+    <div class="error">Įveskite projekto tiksla.</div>
 
-    <label>Koks yra pageidaujamas namo vidaus plotas, įskaitant vidines sienas?</label> 
-    <input name="namo_plotas" placeholder="162.93" required type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Kokios energetinės klasės namo pageidauja klientas?</label>
-    <select name="energetine_klase" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="A++">A++</option>
-      <option value="Žemiau A++">Žemiau A++</option>
-      <option value="Vasarnamis">Vasarnamis</option>
-    </select>
-    <div class="error">Pasirinkite klasę.</div>
-
-    <label>Kurį pasiūlymo paketą renkasi klientas?</label>
-    <select name="paketas" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Economy">Economy</option>
-      <option value="Premium">Premium</option>
-      <option value="Premium +">Premium +</option>
-      <option value="Ultra">Ultra</option>
-      <option value="Ultra +">Ultra +</option>
-    </select>
-    <div class="error">Pasirinkite paketą.</div>
-
-    <div class="button-row">
-      <button type="button" onclick="prevStep()">Atgal</button>
-      <button type="button" onclick="nextStep()">Toliau</button>
-    </div>
-  </div>
-
-  <!-- Step 3 -->
-  <div class="step">
-    <label>Koks yra pageidaujamas antresolės karkaso plotas?</label>
-    <input name="antresoles_karkaso_plotas" placeholder="8.12" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Kokio tipo pamatų pageidauja klientas?</label>
-    <select name="pamatai" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Sraigtiniai">Sraigtiniai</option>
-      <option value="Betoniniai Poliams">Betoniniai Poliams</option>
-      <option value="Betoniniai Rostverkas">Betoniniai Rostverkas</option>
-    </select>
-    <div class="error">Pasirinkite Pamatus.</div>
-
-    <label>Kiek metrų sudaro kliento namo vidaus sienų ilgis bėginiais metrais?</label>
-    <input name="sienu_ilgis" placeholder="8.12" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Koks turėtų būti kliento namo vidaus plotis, m?</label>
-    <input name="namo_plotis" placeholder="5.1" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Koks turėtų būti priekinės kliento namo sienos aukštis, m?</label>
-    <input name="priekines_sienos_aukstis" placeholder="3.75" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Koks turėtų būti galinės kliento namo sienos aukštis, m?</label>
-    <input name="galines_sienos_aukstis" placeholder="2.66" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <div class="button-row">
-      <button type="button" onclick="prevStep()">Atgal</button>
-      <button type="button" onclick="nextStep()">Toliau</button>
-    </div>
-  </div>
-
-  <!-- Step 4 -->
-  <div class="step">
-    <label>Jei namas su daugiau nei vienu šlaitu – koks turėtų būti aukščiausios kliento namo sienos aukštis, m?</label>
-    <input name="auksciausia_siena" placeholder="4.12" type="number"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Kokio tipo stogo šlaito pageidauja klientas?</label>
-    <select name="Slaito Tipas" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Vienaslaitis">Vienašlaitis</option>
-      <option value="Dvislaitis">Dvišlaitis</option>
-      <option value="Daugiaslaitis">Daugiaslaitis</option>
-      <option value="Lygus">Lygus</option>
-    </select>
-    <div class="error">Pasirinkite stogo šlaito tipą.</div>
-
-    <label>Įrašykite objekto, kur bus statomas namas, lokaciją (adresą, miestą )</label>
-    <input name="lokacija" placeholder="Vilnius, Lietuva" type="text"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
-
-    <label>Kokio tipo stogo dangos pageidauja klientas?</label>
-    <select name="Stogo Danga" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Skardinė danga - Classic">Skardinė danga - Classic</option>
-      <option value="Bituminė stogo danga">Bituminė stogo danga</option>
-      <option value="EPDM stogo danga">EPDM stogo danga</option>
-    </select>
-    <div class="error">Pasirinkite stogo dangos tipą.</div>
-
-    <label>Ar projektas yra kliento (reikalaus daugiau korekcijų), ar mūsų (su minimaliais pakeitimais)?</label>
-    <select name="Projekto tipas" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Mini korekcijos">Mūsų</option>
-      <option value="Individualus Pastatas">Kliento</option>
-      <option value="Org Projektas">Org Projektas</option>
-    </select>
-    <div class="error">Pasirinkite projekto tipą.</div>
+<label>Dabartinis procesas</label> 
+    <input name="procesas" placeholder="pardavimai ranka pildo užklausas, skaičiuoja kainas ir tikrina kainas ir siunčia pdf klientui" required type="text"/>
+    <div class="error">Įveskite dabartini procesą.</div>
+    
+<label>Didžiausi galvos skausmai</label> 
+    <input name="skausmai" placeholder="laikas, erorai, prarasti leads'ai, pristatymai, pns." required type="text"/>
+    <div class="error">Įveskite didžiausia galvos skausmą.</div>
 
     <div class="button-row">
       <button type="button" onclick="prevStep()">Atgal</button>
@@ -397,25 +311,24 @@ button:hover { background-color: #7c9dbf; }
   <!-- Step 5 -->
   <div class="step">
  
- 
-    <div class="checkbox-section-title">Ar reikalingi papildomi elementai?</div>
+    <div class="checkbox-section-title">Kokie pristatomi dalykai</div>
     <div class="checkbox-group">
-      <label><input type="checkbox" name="papildomi[]" value="Šild. grindys"> Šild. grindys</label>
-      <label><input type="checkbox" name="papildomi[]" value="Kaminas"> Kaminas</label>
-      <label><input type="checkbox" name="papildomi[]" value="OSB sienoms"> OSB sienoms</label>
-      <label><input type="checkbox" name="papildomi[]" value="Rekup. mini"> Rekup. mini</label>
-      <label><input type="checkbox" name="papildomi[]" value="Rekup. norm."> Rekup. norm.</label>
-      <label><input type="checkbox" name="papildomi[]" value="Kondiš. 1"> Kondiš. 1</label>
-      <label><input type="checkbox" name="papildomi[]" value="Kondiš. 2"> Kondiš. 2</label>
-      <label><input type="checkbox" name="papildomi[]" value="Gipsas"> Gipsas</label>
-      <label><input type="checkbox" name="papildomi[]" value="Elektra"> Elektra</label>
+      <label><input type="checkbox" name="papildomi[]" value=" Build automation workflows">  Build automation workflows </label>
+      <label><input type="checkbox" name="papildomi[]" value="Integrations (APIs, webhooks)"> Integrations (APIs, webhooks) </label>
+      <label><input type="checkbox" name="papildomi[]" value="Data sync between tools"> Data sync between tools </label>
+      <label><input type="checkbox" name="papildomi[]" value="Dashboards / reporting"> Dashboards / reporting </label>
+      <label><input type="checkbox" name="papildomi[]" value="Documentation + handover"> Documentation + handover </label>
+      <label><input type="checkbox" name="papildomi[]" value="Team training"> Team training</label>
+      <label><input type="checkbox" name="papildomi[]" value="Ongoing support"> Ongoing support </label>
     </div>
-
-    <div class="checkbox-section-title">Pasirinkite papildomus darbus:</div>
-    <div class="checkbox-group">
-      <label><input type="checkbox" name="darbai[]" value="MPP (sienų plokštė)"> MPP (sienų plokštė)</label>
-      <label><input type="checkbox" name="darbai[]" value="Fasado dažymas"> Fasado dažymas</label>
-    </div>
+    
+    <label>Privaloma turėti</label> 
+    <input name="Privaloma" placeholder="Kad būtų pagal aprašymą." required type="text"/>
+    <div class="error">Įveskite kas yra privaloma.</div>
+    
+    <label>Norėtusi turėti</label> 
+    <input name="Noretina" placeholder="KAd papildomai išsiustų žinutę į slack" required type="text"/>
+    <div class="error">Įveskite kas būti tik norima papilodmai turėti.</div>
 
     <label>Koks grindų šildymas?</label>
     <select name="Šildymo Tipas" required>
