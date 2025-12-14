@@ -221,8 +221,6 @@ button:hover { background-color: #7c9dbf; }
   overflow: visible;
   text-overflow: clip;
 }
-
-
 </style>
 </head>
 <body>
@@ -236,8 +234,7 @@ button:hover { background-color: #7c9dbf; }
   <div id="formPick" style="display:flex;flex-direction:column;gap:15px;align-items:stretch;margin-top:20px;">
     <button type="button" class="form-select-btn" data-type="Projektas"> Projekto </button>
     <button type="button" class="form-select-btn" data-type="Pasiulymas">Pasiulymo </button>
-<button type="button" class="form-select-btn" data-type="saskaita">Sąskaitos </button>
-
+    <button type="button" class="form-select-btn" data-type="saskaita">Sąskaitos </button>
   </div>
 </div>
 
@@ -263,26 +260,30 @@ button:hover { background-color: #7c9dbf; }
     <label>Koks yra kliento telefono numeris?</label>
     <input name="telefonas" placeholder="+37061321321" required type="tel"/>
     <div class="error">Įveskite galiojantį telefono numerį.</div>
-     <label>Įmonės Pavadinimas</label>
+
+    <label>Įmonės Pavadinimas</label>
     <input name="imone" placeholder="UAB Įmonė" required type="text"/>
     <div class="error">Įveskite įmonės pavadinimą.</div>
-     <label>Įmonės Puslapis</label>
-    <input name="imone" placeholder="www.imonė.com" required type="text"/>
-    <div class="error">Įveskite įmonės puslapi.</div>
+
+    <label>Įmonės Puslapis</label>
+    <input name="imones_puslapis" placeholder="https://www.imone.lt" required type="url" inputmode="url"/>
+    <div class="error">Įveskite įmonės puslapį.</div>
+
     <label>Kaip norima komunikuoti</label>
     <select name="komunikacija" required>
       <option value="" disabled selected>Pasirinkite</option>
-      <option value="whatsap">WhatsApp</option>
+      <option value="whatsapp">WhatsApp</option>
       <option value="email">E-mail</option>
       <option value="slack">Slack</option>
       <option value="other">Other</option>
     </select>
     <div class="error">Pasirinkite komunikacija.</div>
-<div class="button-row">
-    <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
-  <button type="button" onclick="nextStep()">Toliau</button>
-</div>
-</div> 
+
+    <div class="button-row">
+      <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div> 
 
   <!-- Step 2 -->
   <div class="step">
@@ -290,15 +291,15 @@ button:hover { background-color: #7c9dbf; }
     <input name="pavadinimas" placeholder="n8n -> CRM -> WhatsApp" required type="text"/>
     <div class="error">Įveskite pavadinimą.</div>
     
-<label>Koks projekto tikslas?</label> 
+    <label>Koks projekto tikslas?</label> 
     <input name="tikslas" placeholder="Pagreitinti pardavimų procesus" required type="text"/>
     <div class="error">Įveskite projekto tiksla.</div>
 
-<label>Dabartinis procesas</label> 
+    <label>Dabartinis procesas</label> 
     <input name="procesas" placeholder="pardavimai ranka pildo užklausas, skaičiuoja kainas ir tikrina kainas ir siunčia pdf klientui" required type="text"/>
     <div class="error">Įveskite dabartini procesą.</div>
     
-<label>Didžiausi galvos skausmai</label> 
+    <label>Didžiausi galvos skausmai</label> 
     <input name="skausmai" placeholder="laikas, erorai, prarasti leads'ai, pristatymai, pns." required type="text"/>
     <div class="error">Įveskite didžiausia galvos skausmą.</div>
 
@@ -308,18 +309,17 @@ button:hover { background-color: #7c9dbf; }
     </div>
   </div>
 
-  <!-- Step 5 -->
+  <!-- Step 3 -->
   <div class="step">
- 
     <div class="checkbox-section-title">Kokie pristatomi dalykai</div>
     <div class="checkbox-group">
-      <label><input type="checkbox" name="papildomi[]" value=" Build automation workflows">  Build automation workflows </label>
-      <label><input type="checkbox" name="papildomi[]" value="Integrations (APIs, webhooks)"> Integrations (APIs, webhooks) </label>
-      <label><input type="checkbox" name="papildomi[]" value="Data sync between tools"> Data sync between tools </label>
-      <label><input type="checkbox" name="papildomi[]" value="Dashboards / reporting"> Dashboards / reporting </label>
-      <label><input type="checkbox" name="papildomi[]" value="Documentation + handover"> Documentation + handover </label>
-      <label><input type="checkbox" name="papildomi[]" value="Team training"> Team training</label>
-      <label><input type="checkbox" name="papildomi[]" value="Ongoing support"> Ongoing support </label>
+      <label><input type="checkbox" name="deliverables[]" value=" Build automation workflows">  Build automation workflows </label>
+      <label><input type="checkbox" name="deliverables[]" value="Integrations (APIs, webhooks)"> Integrations (APIs, webhooks) </label>
+      <label><input type="checkbox" name="deliverables[]" value="Data sync between tools"> Data sync between tools </label>
+      <label><input type="checkbox" name="deliverables[]" value="Dashboards / reporting"> Dashboards / reporting </label>
+      <label><input type="checkbox" name="deliverables[]" value="Documentation + handover"> Documentation + handover </label>
+      <label><input type="checkbox" name="deliverables[]" value="Team training"> Team training</label>
+      <label><input type="checkbox" name="deliverables[]" value="Ongoing support"> Ongoing support </label>
     </div>
     
     <label>Privaloma turėti</label> 
@@ -327,44 +327,8 @@ button:hover { background-color: #7c9dbf; }
     <div class="error">Įveskite kas yra privaloma.</div>
     
     <label>Norėtusi turėti</label> 
-    <input name="Noretina" placeholder="KAd papildomai išsiustų žinutę į slack" required type="text"/>
-    <div class="error">Įveskite kas būti tik norima papilodmai turėti.</div>
-
-    <label>Koks grindų šildymas?</label>
-    <select name="Šildymo Tipas" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Vamzdukai">Vamzdukai</option>
-      <option value="Nieko">Nieko</option>
-      <option value="Infrared">Infrared</option>
-    </select>
-    <div class="error">Pasirinkite šildymo tipą.</div>
-
-    <label>Koks langų tipas</label>
-    <select name="Langų tipas" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="PVC langai">PVC langai</option>
-      <option value="Aliuminiai langai">Aliuminiai langai</option>
-      <option value="Mediniai langai">Mediniai langai</option>
-    </select>
-    <div class="error">Pasirinkite lango tipą.</div>
-
-    <label>Langų pasirinkimas:</label>
-    <div id="windowsSection">
-      <div class="window-block" style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
-        <select name="window_size[]" required style="flex:1;">
-          <option value="" disabled selected>Pasirinkite</option>
-          <option value="2000x2250">2000x2250</option>
-          <option value="3600x2250">3600x2250</option>
-          <option value="1000x2250">1000x2250</option>
-          <option value="900x2250 LD">900x2250 LD</option>
-          <option value="1800x2250">1800x2250</option>
-          <option value="660x1180 Stoglangis">660x1180 Stoglangis</option>
-        </select>
-        <input type="number" name="window_qty[]" min="0" placeholder="Kiekis" required style="flex:0.6;"/>
-        <button class="remove-window" type="button" onclick="removeWindow(this)" style="color:red;font-size:14px;background:none;border:none;cursor:pointer;">✕</button>
-      </div>
-    </div>
-    <button type="button" onclick="addWindow()" style="margin-top:10px;background-color:#92B1D0;color:white;padding:10px 20px;border:none;border-radius:12px;">+ Pridėti langą</button>
+    <input name="Noretina" placeholder="Kad papildomai išsiustų žinutę į slack" required type="text"/>
+    <div class="error">Įveskite kas būti tik norima papildomai turėti.</div>
 
     <div class="button-row">
       <button type="button" onclick="prevStep()">Atgal</button>
@@ -372,6 +336,61 @@ button:hover { background-color: #7c9dbf; }
     </div>
   </div>
 
+ <!-- Step 4 -->
+  <div class="step">
+   <div class="checkbox-section-title">Kokios sistemos?</div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="sistems[]" value=" Gmail">  Gmail </label>
+      <label><input type="checkbox" name="sistems[]" value="HubSpot"> HubSpot </label>
+      <label><input type="checkbox" name="sistems[]" value="Pipedrive"> Pipedrive </label>
+      <label><input type="checkbox" name="sistems[]" value="Shopify"> Shopify </label>
+      <label><input type="checkbox" name="sistems[]" value="Airtable"> Airtable </label>
+      <label><input type="checkbox" name="sistems[]" value="GoogleSheets"> Google Sheets</label>
+      <label><input type="checkbox" name="sistems[]" value="Other"> Other </label>
+    </div>
+
+    <label>Kita</label> 
+    <input name="Othersis" placeholder="Kokios kitos sistemos?" required type="text"/>
+    <div class="error">Įveskite kokios kitos sistemos.</div>
+    
+    <div class="checkbox-section-title">Ar turi account'ą</div>
+    <div class="checkbox-group">
+      <label><input type="radio" name="account[]" value=" taip">  taip </label>
+      <label><input type="radio" name="account[]" value="ne"> ne </label>
+    </div>
+      
+    <div class="checkbox-section-title">Ar gali suteikti prieiga šiandien?</div>
+    <div class="checkbox-group">
+      <label><input type="radio" name="accesstoday[]" value=" taip">  taip </label>
+      <label><input type="radio" name="accesstoday[]" value="ne"> ne </label>
+    </div>
+
+    <label>Patvirtinimas</label>
+    <select name="approval" required>
+      <option value="" disabled selected>Pasirinkite</option>
+      <option value="oauth">Oauth</option>
+      <option value="APIkey">APIkey</option>
+      <option value="webhook">Webhook</option>
+      <option value="unknown">Unknown</option>
+    </select>
+
+    <div class="checkbox-section-title">Acceptance criteria</div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="acceptancec[]" value=" Workflow runs without manual steps">  Workflow runs without manual steps </label>
+      <label><input type="checkbox" name="acceptancec[]" value="Error handling included"> Error handling included </label>
+      <label><input type="checkbox" name="acceptancec[]" value="Logs available"> Logs available </label>
+      <label><input type="checkbox" name="acceptancec[]" value="Docs delivered"> Docs delivered </label>
+    </div>
+      
+    <label>Kaip bus sekmė pamatuota?</label> 
+    <input name="SekmesMatavimas" placeholder="hours saved, fewer errors, faster response," required type="text"/>
+    <div class="error">Įveskite kaip bus pamatuota sekmė.</div>
+
+    <div class="button-row">
+      <button type="button" onclick="prevStep()">Atgal</button>
+      <button type="button" onclick="nextStep()">Toliau</button>
+    </div>
+  </div>
 
     <!-- Submission step -->
     <div class="step">
@@ -382,11 +401,9 @@ button:hover { background-color: #7c9dbf; }
       </div>
     </div>
 
-
-<input type="hidden" name="form_type" value="">
+    <input type="hidden" name="form_type" value="">
     <!-- Floating comments inside form -->
     <div class="comment-fab collapsed">
-        
       <button type="button" class="comment-toggle" aria-expanded="false">✎</button>
       <div class="comment-panel">
         <label>Pastabos / Komentarai</label>
@@ -403,7 +420,7 @@ button:hover { background-color: #7c9dbf; }
     <div class="step active">
       <label>Kliento Vardas ir Pavardė</label>
       <input name="vardas" placeholder="Vardenis Pavardenis" required type="text"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
+      <div class="error">Šis laukelis yra privalomas.</div>
       
       <label>El. paštas</label>
       <input name="email" placeholder="VardenisPavardenis@gmail.com" required type="email"/>
@@ -411,28 +428,28 @@ button:hover { background-color: #7c9dbf; }
       
       <label>Telefono Nr.</label>
       <input name="telefonas" placeholder="+37061234567" required type="tel"/>
-            <div class="error">Šis laukelis yra privalomas.</div>
+      <div class="error">Šis laukelis yra privalomas.</div>
             
-    <label>Asmens Kodas</label>
-<input name="asmKodas" placeholder="37061234567 arba 37061234567 ir 37061234567" required type="text" inputmode="numeric" pattern="^\d{8,13}(?:\sir\s\d{8,13})?$" title="Įveskite 1 arba 2 asmens kodus (8–13 skaitmenų), atskirtus žodžiu „ir“"
-/>
-          <div class="error">Šis laukelis yra privalomas.</div>
+      <label>Asmens Kodas</label>
+      <input name="asmKodas" placeholder="37061234567 arba 37061234567 ir 37061234567" required type="text" inputmode="numeric" pattern="^\d{8,13}(?:\s+ir\s+\d{8,13})?$" title="Įveskite 1 arba 2 asmens kodus (8–13 skaitmenų), atskirtus žodžiu „ir“"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
           
       <label>Adresas</label>
       <input name="adresas" placeholder="Naujoji g.5-9, Rūdiškės, Trakų raj." required type="text"/>
       <div class="error">Šis laukelis yra privalomas.</div>
- <div class="button-row">
-    <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
-  <button type="button" onclick="nextStep()">Toliau</button>
-</div>
+
+      <div class="button-row">
+        <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+        <button type="button" onclick="nextStep()">Toliau</button>
+      </div>
     </div>
     
     <div class="step">
-              <label>Projekto Pavadinimas</label>
+      <label>Projekto Pavadinimas</label>
       <input name="ProjektoPavadinimas" placeholder="Namiele Smėlio debesis 140m2 karkasinio namo projektas" required type="text"/>
-    <label>Per Kiek laiko bus projektas paruoštas</label>
+      <label>Per Kiek laiko bus projektas paruoštas</label>
       <input name="ProjektoPeriodas" placeholder="6" required type="number"/>
-     <div class="error">Šis laukelis yra privalomas.</div>
+      <div class="error">Šis laukelis yra privalomas.</div>
       <label>Projekto Lygis</label>
       <select name="p_lygis" required>
         <option value="" disabled selected>Pasirinkite</option>
@@ -453,7 +470,7 @@ button:hover { background-color: #7c9dbf; }
         <button class="submit-button" type="submit">Pateikti</button>
       </div>
     </div>
-<input type="hidden" name="form_type" value="">
+    <input type="hidden" name="form_type" value="">
     <div class="comment-fab collapsed">
       <button type="button" class="comment-toggle" aria-expanded="false">✎</button>
       <div class="comment-panel">
@@ -464,148 +481,155 @@ button:hover { background-color: #7c9dbf; }
 
   </form>
   
-<!-- Sąskaitos (Invoice) -->
-<form id="form-saskaita" class="clientForm" novalidate style="display:none;">
-  <h2 style="text-align:center;margin-bottom:20px;">Sąskaitos išrašymo forma</h2>
-  <div class="progress-container"><div class="progress-bar"></div></div>
+  <!-- Sąskaitos (Invoice) -->
+  <form id="form-saskaita" class="clientForm" novalidate style="display:none;">
+    <h2 style="text-align:center;margin-bottom:20px;">Sąskaitos išrašymo forma</h2>
+    <div class="progress-container"><div class="progress-bar"></div></div>
 
-  <!-- Step 1: Gavėjas ir tiekėjas -->
-  <div class="step active">
-    <label>Kuri Namiele įmonė išrašinėja</label>
-    <select name="invoice_company" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="Namiele, UAB">Namiele, UAB</option>
-      <option value="Namiele Group, UAB">Namiele Group, UAB</option>
-      <option value="Rentifus, UAB">Rentifus, UAB</option>
-    </select>
-    <div class="error">Pasirinkite įmonę.</div>
+    <!-- Step 1: Gavėjas ir tiekėjas -->
+    <div class="step active">
+      <label>Kuri Namiele įmonė išrašinėja</label>
+      <select name="invoice_company" required>
+        <option value="" disabled selected>Pasirinkite</option>
+        <option value="Namiele, UAB">Namiele, UAB</option>
+        <option value="Namiele Group, UAB">Namiele Group, UAB</option>
+        <option value="Rentifus, UAB">Rentifus, UAB</option>
+      </select>
+      <div class="error">Pasirinkite įmonę.</div>
 
-    <label>Vardas Pavardė / Įmonė</label>
-    <input name="invoice_client_name" placeholder="Jonas Jonaitis arba UAB Pavyzdys" required type="text"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
+      <label>Vardas Pavardė / Įmonė</label>
+      <input name="invoice_client_name" placeholder="Jonas Jonaitis arba UAB Pavyzdys" required type="text"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
 
-    <label>Asmens kodas / Įmonės kodas</label>
-    <input name="invoice_client_code" placeholder="123456789 arba 123456789" required type="text" inputmode="numeric"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
+      <label>Asmens kodas / Įmonės kodas</label>
+      <input name="invoice_client_code" placeholder="123456789 arba 123456789" required type="text" inputmode="numeric"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
 
-    <label>PVM m. k (jei yra)</label>
-    <input name="invoice_client_vat" placeholder="LT123456789" type="text"/>
+      <label>PVM m. k (jei yra)</label>
+      <input name="invoice_client_vat" placeholder="LT123456789" type="text"/>
 
-    <label>Adresas</label>
-    <input name="invoice_client_address" placeholder="Gatvė 1, Miestas" required type="text"/>
-    <div class="error">Šis laukelis yra privalomas.</div>
+      <label>Adresas</label>
+      <input name="invoice_client_address" placeholder="Gatvė 1, Miestas" required type="text"/>
+      <div class="error">Šis laukelis yra privalomas.</div>
 
-    <label>Gavėjo el. paštas</label>
-    <input name="invoice_client_email" placeholder="gavėjas@pastas.lt" required type="email"/>
-    <div class="error">Įveskite galiojantį el. pašto adresą.</div>
+      <label>Gavėjo el. paštas</label>
+      <input name="invoice_client_email" placeholder="gavėjas@pastas.lt" required type="email"/>
+      <div class="error">Įveskite galiojantį el. pašto adresą.</div>
 
-    <div class="button-row">
-      <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
-      <button type="button" onclick="nextStep()">Toliau</button>
+      <div class="button-row">
+        <button type="button" class="back-to-selector" onclick="backToSelector()">← Grįžti į formos pasirinkimą</button>
+        <button type="button" onclick="nextStep()">Toliau</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Step 2: Prekės / Paslaugos (repeatable) -->
-  <div class="step">
-    <div class="invoice-items" id="invoiceItems">
-      <div class="invoice-item">
-        <div class="item-grid">
-          <div>
-            <label>Prekės / Paslaugos pavadinimas</label>
-            <input name="item_name[]" required type="text" placeholder="Pvz. Projektavimo paslauga"/>
-            <div class="error">Šis laukelis yra privalomas.</div>
+    <!-- Step 2: Prekės / Paslaugos (repeatable) -->
+    <div class="step">
+      <div class="invoice-items" id="invoiceItems">
+        <div class="invoice-item">
+          <div class="item-grid">
+            <div>
+              <label>Prekės / Paslaugos pavadinimas</label>
+              <input name="item_name[]" required type="text" placeholder="Pvz. Projektavimo paslauga"/>
+              <div class="error">Šis laukelis yra privalomas.</div>
+            </div>
+            <div>
+              <label>Matavimo vnt</label>
+              <select name="item_unit[]" required>
+                <option value="" disabled selected>Pasirinkite</option>
+                <option value="vnt">vnt</option>
+                <option value="val">val</option>
+                <option value="kompl">kompl</option>
+              </select>
+              <div class="error">Pasirinkite matavimo vnt.</div>
+            </div>
+            <div>
+              <label>Kiekis</label>
+              <input name="item_qty[]" required type="number" step="any" inputmode="decimal" placeholder="1"/>
+              <div class="error">Įveskite kiekį.</div>
+            </div>
+            <div>
+              <label>Kaina (EUR, be PVM)</label>
+              <input name="item_price[]" required type="number" step="any" inputmode="decimal" placeholder="100"/>
+              <div class="error">Įveskite kainą.</div>
+            </div>
           </div>
-          <div>
-            <label>Matavimo vnt</label>
-            <select name="item_unit[]" required>
-              <option value="" disabled selected>Pasirinkite</option>
-              <option value="vnt">vnt</option>
-              <option value="val">val</option>
-              <option value="kompl">kompl</option>
-            </select>
-            <div class="error">Pasirinkite matavimo vnt.</div>
-          </div>
-          <div>
-            <label>Kiekis</label>
-            <input name="item_qty[]" required type="number" step="any" inputmode="decimal" placeholder="1"/>
-            <div class="error">Įveskite kiekį.</div>
-          </div>
-          <div>
-            <label>Kaina (EUR, be PVM)</label>
-            <input name="item_price[]" required type="number" step="any" inputmode="decimal" placeholder="100"/>
-            <div class="error">Įveskite kainą.</div>
-          </div>
+          <button class="remove-item" type="button" onclick="removeInvoiceItem(this)" style="color:red;background:none;border:none;cursor:pointer;margin-top:6px;">✕ Pašalinti eilutę</button>
         </div>
-        <button class="remove-item" type="button" onclick="removeInvoiceItem(this)" style="color:red;background:none;border:none;cursor:pointer;margin-top:6px;">✕ Pašalinti eilutę</button>
+      </div>
+
+      <button type="button" onclick="addInvoiceItem()" style="margin-top:10px;background-color:#92B1D0;color:white;padding:10px 20px;border:none;border-radius:12px;">+ Pridėti eilutę</button>
+
+      <div class="button-row">
+        <button type="button" onclick="prevStep()">Atgal</button>
+        <button type="button" onclick="nextStep()">Toliau</button>
       </div>
     </div>
 
-    <button type="button" onclick="addInvoiceItem()" style="margin-top:10px;background-color:#92B1D0;color:white;padding:10px 20px;border:none;border-radius:12px;">+ Pridėti eilutę</button>
+    <!-- Step 3: Nustatymai -->
+    <div class="step">
+      <label>Apmokėjimo terminas</label>
+      <select name="invoice_terms" required>
+        <option value="" disabled selected>Pasirinkite</option>
+        <option value="0">Tą pačia diena</option>
+        <option value="7">7 dienos</option>
+        <option value="14">14 dienų</option>
+        <option value="30">30 dienų</option>
+        <option value="45">45 dienos</option>
+      </select>
+      <div class="error">Pasirinkite apmokėjimo terminą.</div>
 
-    <div class="button-row">
-      <button type="button" onclick="prevStep()">Atgal</button>
-      <button type="button" onclick="nextStep()">Toliau</button>
-    </div>
-  </div>
-
-  <!-- Step 3: Nustatymai -->
-  <div class="step">
-    <label>Apmokėjimo terminas</label>
-    <select name="invoice_terms" required>
-      <option value="" disabled selected>Pasirinkite</option>
-      <option value="0">Tą pačia diena</option>
-      <option value="7">7 dienos</option>
-      <option value="14">14 dienų</option>
-      <option value="30">30 dienų</option>
-      <option value="45">45 dienos</option>
-    </select>
-    <div class="error">Pasirinkite apmokėjimo terminą.</div>
-
- <div class="checkbox-section-title"></div>
-    <div class="checkbox-group">
-      <label><input type="checkbox" name="AtvirkštinisPVM[]" value="ATV.PVM"> Atvirkštinis PVM</label>
+      <div class="checkbox-section-title"></div>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="AtvirkštinisPVM[]" value="ATV.PVM"> Atvirkštinis PVM</label>
       </div>
 
-    <div class="button-row">
-      <button type="button" onclick="prevStep()">Atgal</button>
-      <button type="button" onclick="nextStep()">Toliau</button>
+      <div class="button-row">
+        <button type="button" onclick="prevStep()">Atgal</button>
+        <button type="button" onclick="nextStep()">Toliau</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Step 4: Pateikimas -->
-  <div class="step">
-    <p>Patikrinkite duomenis. Suma bus paskaičiuota automatiškai pagal eilutes.</p>
+    <!-- Step 4: Pateikimas -->
+    <div class="step">
+      <p>Patikrinkite duomenis. Suma bus paskaičiuota automatiškai pagal eilutes.</p>
 
-<div class="invoice-summary">
-  <div><strong>Iš viso be PVM:</strong> <span id="invoiceTotalNet">0.00</span> EUR</div>
-  <div><strong>PVM <span id="vatRateLabel">21</span>%:</strong> <span id="invoiceVAT">0.00</span> EUR</div>
-  <div><strong>Bendra suma (su PVM):</strong> <span id="invoiceTotalGross">0.00</span> EUR</div>
+      <div class="invoice-summary">
+        <div><strong>Iš viso be PVM:</strong> <span id="invoiceTotalNet">0.00</span> EUR</div>
+        <div><strong>PVM <span id="vatRateLabel">21</span>%:</strong> <span id="invoiceVAT">0.00</span> EUR</div>
+        <div><strong>Bendra suma (su PVM):</strong> <span id="invoiceTotalGross">0.00</span> EUR</div>
+      </div>
+
+      <label>Suma žodžiais (be PVM)</label>
+      <textarea name="invoice_total_words_net" placeholder="Automatiškai" readonly></textarea>
+
+      <label>Suma žodžiais (su PVM)</label>
+      <textarea name="invoice_total_words" placeholder="Automatiškai" readonly></textarea>
+
+      <div class="button-row">
+        <button type="button" onclick="prevStep()">Atgal</button>
+        <button class="submit-button" type="submit">Pateikti</button>
+      </div>
+    </div>
+
+    <input type="hidden" name="form_type" value="saskaita">
+
+    <div class="comment-fab collapsed">
+      <button type="button" class="comment-toggle" aria-expanded="false">✎</button>
+      <div class="comment-panel">
+        <label>Pastabos / Komentarai</label>
+        <textarea class="comment-text" name="comments" placeholder="Įrašykite pastabas..."></textarea>
+      </div>
+    </div>
+
+  </form>
+
 </div>
-
-<label>Suma žodžiais (be PVM)</label>
-<textarea name="invoice_total_words_net" placeholder="Automatiškai" readonly></textarea>
-
-<label>Suma žodžiais (su PVM)</label>
-<textarea name="invoice_total_words" placeholder="Automatiškai" readonly></textarea>
-
-
-
-    <div class="button-row">
-      <button type="button" onclick="prevStep()">Atgal</button>
-      <button class="submit-button" type="submit">Pateikti</button>
-    </div>
-  </div>
-
-  <input type="hidden" name="form_type" value="saskaita">
-
-
 
 <a href="https://www.namiele.lt/" target="_blank" aria-label="Namiele pagrindinis puslapis">
   <img src="https://cdn.brandfetch.io/idGYJwW34f/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B"
        alt="Namiele logotipas"
        style="position: fixed; top: 20px; right: 20px; width: 80px; height: 80px; max-width: 20vw; max-height: 20vw; opacity: 1; z-index: 1000; border-radius: 12px;">
 </a>
-
 
 <script>
 let currentForm = null;
@@ -628,24 +652,21 @@ window.startSelectedForm = function(type) {
   progressBar = currentForm.querySelector(".progress-bar");
   currentStep = 0;
   showStep(0);
-  
 
   // rebuild window sizes (you already do this elsewhere, safe if it runs)
-if (typeof buildWindowSizeSelect === "function") {
-  currentForm.querySelectorAll('select[name="window_size[]"]').forEach(buildWindowSizeSelect);
-}
+  if (typeof buildWindowSizeSelect === "function") {
+    currentForm.querySelectorAll('select[name="window_size[]"]').forEach(buildWindowSizeSelect);
+  }
 
-// init invoice dropdowns/totals if this is the invoice form
-if (currentForm.id === 'form-saskaita') {
-  recalcInvoice(); // sets initial totals to 0.00
-}
-
+  // init invoice dropdowns/totals if this is the invoice form
+  if (currentForm.id === 'form-saskaita') {
+    recalcInvoice(); // sets initial totals to 0.00
+  }
 
   if (typeof restoreSessionData === "function") restoreSessionData(currentForm);
 };
 
 const DEFAULT_VAT_RATE = 0.21; // 21%
-
 
 function updateProgressBar() {
   if (!progressBar) return;
@@ -658,7 +679,7 @@ function showStep(index) {
 }
 function validateStep(stepIndex) {
   const step = steps[stepIndex];
-  const inputs = step.querySelectorAll("input, select");
+  const inputs = step.querySelectorAll("input, select, textarea");
   let valid = true;
 
   inputs.forEach(input => {
@@ -683,7 +704,6 @@ function nextStep() {
 function prevStep() {
   if (currentStep > 0) { currentStep--; showStep(currentStep); }
 }
-
 
 document.querySelectorAll("#formsContainer form").forEach(form => {
   form.addEventListener("submit", async function (e) {
@@ -723,57 +743,54 @@ document.querySelectorAll("#formsContainer form").forEach(form => {
     if (tmp.window_size.length) json.window_size = tmp.window_size;
     if (tmp.window_qty.length)  json.window_qty  = tmp.window_qty;
 
-// Rebuild windows from DOM to capture the selected option's GROUP
-const winBlocks = this.querySelectorAll('#windowsSection .window-block, .windowsSection .window-block');
+    // ----- Windows repeater (only if present in this form) -----
+    const winBlocks = this.querySelectorAll('#windowsSection .window-block, .windowsSection .window-block');
+    if (winBlocks.length) {
+      // Rebuild windows from DOM to capture the selected option's GROUP
+      json.windows = Array.from(winBlocks).map(block => {
+        const sel = block.querySelector('select[name="window_size[]"]');
+        const qtyEl = block.querySelector('input[name="window_qty[]"]');
+        const size = sel ? sel.value : "";
+        const qty  = qtyEl ? qtyEl.value : "";
 
-json.windows = Array.from(winBlocks).map(block => {
-  const sel = block.querySelector('select[name="window_size[]"]');
-  const qtyEl = block.querySelector('input[name="window_qty[]"]');
-  const size = sel ? sel.value : "";
-  const qty  = qtyEl ? qtyEl.value : "";
+        // read the optgroup label -> prefix
+        let prefix = "X";
+        if (sel && sel.selectedOptions && sel.selectedOptions[0]) {
+          const og = sel.selectedOptions[0].parentElement;
+          if (og && og.tagName && og.tagName.toLowerCase() === 'optgroup') {
+            prefix = GROUP_PREFIX[og.label] || "X";
+          } else {
+            // fallback if no optgroup (shouldn't happen after we rebuild selects)
+            prefix = SIZE_PREFIX[size] || "X";
+          }
+        }
+        return { size, qty, prefix };
+      });
 
-  // read the optgroup label -> prefix
-  let prefix = "X";
-  if (sel && sel.selectedOptions && sel.selectedOptions[0]) {
-    const og = sel.selectedOptions[0].parentElement;
-    if (og && og.tagName && og.tagName.toLowerCase() === 'optgroup') {
-      prefix = GROUP_PREFIX[og.label] || "X";
-    } else {
-      // fallback if no optgroup (shouldn't happen after we rebuild selects)
-      prefix = SIZE_PREFIX[size] || "X";
+      // Keep raw arrays for compatibility
+      json.window_size = json.windows.map(w => w.size);
+      json.window_qty  = json.windows.map(w => w.qty);
+
+      // flatten window counts by actual group prefix + size
+      const windowFlat = {};
+      const norm = s => String(s).replace(/\W+/g, "_");
+
+      // initialize all catalog counters per group
+      Object.entries(WINDOW_OPTIONS).forEach(([group, sizes]) => {
+        const pref = GROUP_PREFIX[group] || "X";
+        sizes.forEach(s => { windowFlat["windows_" + pref + "_" + norm(s)] = 0; });
+      });
+
+      // tally selected windows
+      (json.windows ?? []).forEach(w => {
+        if (!w.size) return;
+        const key = "windows_" + w.prefix + "_" + norm(w.size);
+        const n = Number((w.qty ?? "").toString().replace(",", "."));
+        windowFlat[key] = (windowFlat[key] ?? 0) + (isNaN(n) ? 0 : n);
+      });
+
+      Object.assign(json, windowFlat);
     }
-  }
-  return { size, qty, prefix };
-});
-
-
-
-
-// Keep raw arrays for compatibility (same as before)
-json.window_size = json.windows.map(w => w.size);
-json.window_qty  = json.windows.map(w => w.qty);
-
-// flatten window counts by actual group prefix + size
-const windowFlat = {};
-const norm = s => String(s).replace(/\W+/g, "_");
-
-// initialize all catalog counters per group
-Object.entries(WINDOW_OPTIONS).forEach(([group, sizes]) => {
-  const pref = GROUP_PREFIX[group] || "X";
-  sizes.forEach(s => { windowFlat["windows_" + pref + "_" + norm(s)] = 0; });
-});
-
-// tally selected windows
-(json.windows ?? []).forEach(w => {
-  if (!w.size) return;
-  const key = "windows_" + w.prefix + "_" + norm(w.size);
-  const n = Number((w.qty ?? "").toString().replace(",", "."));
-  windowFlat[key] = (windowFlat[key] ?? 0) + (isNaN(n) ? 0 : n);
-});
-
-Object.assign(json, windowFlat);
-
-
 
     // checkbox helpers like the old file (0/1 flags for each possible value)
     const allPap = Array.from(this.querySelectorAll('input[type="checkbox"][name="papildomi[]"]')).map(i => i.value);
@@ -784,57 +801,56 @@ Object.assign(json, windowFlat);
     allDarb.forEach(v => { json["darbai_" + makeKey(v)] = 0; });
     (json.darbai ?? []).forEach(v => { json["darbai_" + makeKey(v)] = 1; });
 
-// ----- Invoice: build items + totals if this is the invoice form -----
-if (this.id === 'form-saskaita' || json.form_type === 'saskaita') {
-  // Build item objects from parallel arrays (names already in json via [] collector)
-  // Build invoice object
-const names  = json['item_name']  || [];
-const units  = json['item_unit']  || [];
-const qtys   = json['item_qty']   || [];
-const prices = json['item_price'] || [];
+    // ----- Invoice: build items + totals if this is the invoice form -----
+    if (this.id === 'form-saskaita' || json.form_type === 'saskaita') {
+      // Build invoice object
+      const names  = json['item_name']  || [];
+      const units  = json['item_unit']  || [];
+      const qtys   = json['item_qty']   || [];
+      const prices = json['item_price'] || [];
 
-const items = names.map((n, i) => ({
-  name: n,
-  unit: units[i] ?? "",
-  qty: Number((qtys[i] ?? "0").toString().replace(',', '.')) || 0,
-  price: Number((prices[i] ?? "0").toString().replace(',', '.')) || 0,
-})).map(it => ({ ...it, line_total: +(it.qty * it.price).toFixed(2) }));
+      const items = names.map((n, i) => ({
+        name: n,
+        unit: units[i] ?? "",
+        qty: Number((qtys[i] ?? "0").toString().replace(',', '.')) || 0,
+        price: Number((prices[i] ?? "0").toString().replace(',', '.')) || 0,
+      })).map(it => ({ ...it, line_total: +(it.qty * it.price).toFixed(2) }));
 
-const total_net = +(items.reduce((s, it) => s + it.line_total, 0)).toFixed(2);
+      const total_net = +(items.reduce((s, it) => s + it.line_total, 0)).toFixed(2);
 
-// reverse VAT flag
-const is_reverse_vat = !!this.querySelector('input[name="AtvirkštinisPVM[]"]:checked');
+      // reverse VAT flag
+      const is_reverse_vat = !!this.querySelector('input[name="AtvirkštinisPVM[]"]:checked');
 
-const vat_rate = is_reverse_vat ? 0 : DEFAULT_VAT_RATE;
-const total_vat = +(total_net * vat_rate).toFixed(2);
-const total_gross = +(total_net + total_vat).toFixed(2);
+      const vat_rate = is_reverse_vat ? 0 : DEFAULT_VAT_RATE;
+      const total_vat = +(total_net * vat_rate).toFixed(2);
+      const total_gross = +(total_net + total_vat).toFixed(2);
 
-json.invoice = {
-  company: json.invoice_company || "",
-  client_name: json.invoice_client_name || "",
-  client_code: json.invoice_client_code || "",
-  client_vat: json.invoice_client_vat || "",
-  client_address: json.invoice_client_address || "",
-  client_email: json.invoice_client_email || "",
-  terms_days: Number(json.invoice_terms || 0) || 0,
-  items,
-  total_net,
-  vat_rate,
-  total_vat,
-  total_gross,
-  is_reverse_vat,
-  total_words_net: amountToWordsLt(total_net),
-  total_words: amountToWordsLt(total_gross) + (is_reverse_vat ? ' (atvirkštinis PVM)' : '')
-};
+      json.invoice = {
+        company: json.invoice_company || "",
+        client_name: json.invoice_client_name || "",
+        client_code: json.invoice_client_code || "",
+        client_vat: json.invoice_client_vat || "",
+        client_address: json.invoice_client_address || "",
+        client_email: json.invoice_client_email || "",
+        terms_days: Number(json.invoice_terms || 0) || 0,
+        items,
+        total_net,
+        vat_rate,
+        total_vat,
+        total_gross,
+        is_reverse_vat,
+        total_words_net: amountToWordsLt(total_net),
+        total_words: amountToWordsLt(total_gross) + (is_reverse_vat ? ' (atvirkštinis PVM)' : '')
+      };
 
-// for convenience
-json.invoice_total_net   = total_net;
-json.invoice_total_vat   = total_vat;
-json.invoice_total_gross = total_gross;
+      // for convenience
+      json.invoice_total_net   = total_net;
+      json.invoice_total_vat   = total_vat;
+      json.invoice_total_gross = total_gross;
 
-  // Optional: also flatten total into top-level keys for easy mapping in n8n
-  json.invoice_total_net = json.invoice.total_net;
-}
+      // Optional: also flatten total into top-level keys for easy mapping in n8n
+      json.invoice_total_net = json.invoice.total_net;
+    }
 
     // send to n8n with session headers
     try {
@@ -862,8 +878,6 @@ json.invoice_total_gross = total_gross;
     }
   });
 });
-
-
 
 // Comment toggle logic
 document.querySelectorAll('.comment-toggle').forEach(btn => {
@@ -979,6 +993,7 @@ async function restoreSessionData(targetForm) {
     });
   }
 }
+
 // Window size catalog with subsections
 const WINDOW_OPTIONS = {
   "PVC/Mediniai": [
@@ -1036,6 +1051,8 @@ function addInvoiceItem() {
     if (el.tagName === 'SELECT') el.selectedIndex = 0;
     else el.value = '';
   });
+  // hide any previous validation errors copied from the first row
+  clone.querySelectorAll('.error').forEach(er => { er.style.display = 'none'; });
 
   wrap.appendChild(clone);
   recalcInvoice(); // update totals
@@ -1058,7 +1075,7 @@ document.addEventListener('input', (e) => {
   if (!currentForm.querySelector('#invoiceItems')) return; // not on invoice form
   const el = e.target;
   if (!currentForm.contains(el)) return;
-  if (el.name === 'item_qty[]' || el.name === 'item_price[]') {
+  if (el.name === 'item_qty[]' || el.name === 'item_price[]' || el.name === 'AtvirkštinisPVM[]') {
     recalcInvoice();
   }
 });
@@ -1101,7 +1118,6 @@ function recalcInvoice() {
   if (wordsGrossEl) wordsGrossEl.value = wordsGross;
 }
 
-
 // Paprasta lietuviška suma žodžiais (0..999 999) – gerai UI'ui, gramatiką patikslink n8n'e jei reikia
 function numberToWordsLt(n) {
   n = Math.floor(Math.abs(n));
@@ -1139,8 +1155,10 @@ function numberToWordsLt(n) {
 
 // valiutos žodžiais: „euras/eurai/eurų“, „centas/centai/centų“
 function amountToWordsLt(total) {
-  const eur = Math.floor(total);
-  const cnt = Math.round((total - eur) * 100);
+  let eur = Math.floor(total);
+  let cnt = Math.round((total - eur) * 100);
+  // handle rounding like 1.995 -> 2.00
+  if (cnt === 100) { eur += 1; cnt = 0; }
 
   const form3 = (k, v1, v2, v3) => {
     const d = k%10, dd = k%100;
@@ -1194,7 +1212,6 @@ function buildWindowSizeSelect(selectEl) {
     ph.selected = false;
   }
 }
-
 
 function addWindow() {
   if (!currentForm) return;
@@ -1311,9 +1328,6 @@ document.querySelectorAll("#formsContainer form").forEach(form => {
     });
   }, { capture: true }); // run before your main submit handler
 });
-
-
-
 </script>
 
 </body>
