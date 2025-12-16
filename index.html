@@ -418,24 +418,8 @@ button:hover { background-color: #7c9dbf; }
     <div class="progress-container"><div class="progress-bar"></div></div>
     <!-- Same steps -->
     <div class="step active">
-      <label>Kliento Vardas ir Pavardė</label>
-      <input name="vardas" placeholder="Vardenis Pavardenis" required type="text"/>
-      <div class="error">Šis laukelis yra privalomas.</div>
-      
-      <label>El. paštas</label>
-      <input name="email" placeholder="VardenisPavardenis@gmail.com" required type="email"/>
-      <div class="error">Šis laukelis yra privalomas.</div>
-      
-      <label>Telefono Nr.</label>
-      <input name="telefonas" placeholder="+37061234567" required type="tel"/>
-      <div class="error">Šis laukelis yra privalomas.</div>
-            
-      <label>Asmens Kodas</label>
-      <input name="asmKodas" placeholder="37061234567 arba 37061234567 ir 37061234567" required type="text" inputmode="numeric" pattern="^\d{8,13}(?:\s+ir\s+\d{8,13})?$" title="Įveskite 1 arba 2 asmens kodus (8–13 skaitmenų), atskirtus žodžiu „ir“"/>
-      <div class="error">Šis laukelis yra privalomas.</div>
-          
-      <label>Adresas</label>
-      <input name="adresas" placeholder="Naujoji g.5-9, Rūdiškės, Trakų raj." required type="text"/>
+      <label>Paste All Data</label>
+      <input name="skelbimas" placeholder="Paste Here" required type="text"/>
       <div class="error">Šis laukelis yra privalomas.</div>
 
       <div class="button-row">
@@ -444,25 +428,6 @@ button:hover { background-color: #7c9dbf; }
       </div>
     </div>
     
-    <div class="step">
-      <label>Projekto Pavadinimas</label>
-      <input name="ProjektoPavadinimas" placeholder="Namiele Smėlio debesis 140m2 karkasinio namo projektas" required type="text"/>
-      <label>Per Kiek laiko bus projektas paruoštas</label>
-      <input name="ProjektoPeriodas" placeholder="6" required type="number"/>
-      <div class="error">Šis laukelis yra privalomas.</div>
-      <label>Projekto Lygis</label>
-      <select name="p_lygis" required>
-        <option value="" disabled selected>Pasirinkite</option>
-        <option value="4500">NAUJAS NAMO PROJEKTAS (nuo 50M2) 4500 EUR</option>
-        <option value="4100">NAUJAS NAMO PROJEKTAS (iki 50M2) 4100Eur</option>
-        <option value="3800">JAU TURIMAS NAMIELE PROJEKTAS (REIKALINGOS KOREKCIJOS) 3800 Eur</option>
-        <option value="3600">JAU TURIMAS PROJEKTAS (BE KOREKCIJŲ) 3600 Eur</option>
-        <option value="3000">MODULINIO LEIDIMAS (NUO 50M2) 3000Eur</option>
-        <option value="2500">MODULINIO LEIDIMAS (IKI 50M2) 2500Eur</option>
-      </select>
-      <div class="error">Šis laukelis yra privalomas.</div>
-      <div class="button-row"><button type="button" onclick="prevStep()">Atgal</button><button type="button" onclick="nextStep()">Toliau</button></div>
-    </div>
     <div class="step">
       <p>Visi duomenys užpildyti.</p>
       <div class="button-row">
